@@ -5,6 +5,20 @@
 
 const googleDriveService = require('../services/googleDrive.service');
 
+/**
+ * Fix Thai filename encoding issue
+ * Multer reads filename as Latin-1, need to convert to UTF-8
+ */
+const fixThaiFilename = (filename) => {
+  try {
+    // Convert from Latin-1 to UTF-8
+    return Buffer.from(filename, 'latin1').toString('utf8');
+  } catch (error) {
+    // If conversion fails, return original filename
+    return filename;
+  }
+};
+
 const uploadController = {
   /**
    * Upload single file to Google Drive
@@ -21,9 +35,10 @@ const uploadController = {
       }
 
       const file = req.file;
+      const fileName = fixThaiFilename(file.originalname);
 
       console.log('Uploading file:', {
-        name: file.originalname,
+        name: fileName,
         size: file.size,
         type: file.mimetype
       });
@@ -31,7 +46,7 @@ const uploadController = {
       // Upload to Google Drive
       const driveFile = await googleDriveService.uploadFile(
         file.buffer,
-        file.originalname,
+        fileName,
         file.mimetype
       );
 
@@ -79,7 +94,7 @@ const uploadController = {
       const uploadPromises = req.files.map(file =>
         googleDriveService.uploadFile(
           file.buffer,
-          file.originalname,
+          fixThaiFilename(file.originalname),
           file.mimetype
         )
       );
