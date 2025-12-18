@@ -87,6 +87,19 @@ class GoogleDriveService {
       return response.data;
     } catch (error) {
       console.error('Error uploading file to Drive:', error);
+      
+      // Provide more helpful error messages for common network issues
+      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+        const networkError = new Error(
+          'Network connectivity issue: Cannot reach Google APIs. ' +
+          'Please check your internet connection, DNS settings, firewall, or proxy configuration. ' +
+          `Error: ${error.message}`
+        );
+        networkError.code = error.code;
+        networkError.originalError = error;
+        throw networkError;
+      }
+      
       throw error;
     }
   }
@@ -109,6 +122,19 @@ class GoogleDriveService {
       return response.data.files;
     } catch (error) {
       console.error('Error listing files:', error);
+      
+      // Provide more helpful error messages for common network issues
+      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+        const networkError = new Error(
+          'Network connectivity issue: Cannot reach Google APIs. ' +
+          'Please check your internet connection, DNS settings, firewall, or proxy configuration. ' +
+          `Error: ${error.message}`
+        );
+        networkError.code = error.code;
+        networkError.originalError = error;
+        throw networkError;
+      }
+      
       throw error;
     }
   }
@@ -129,6 +155,19 @@ class GoogleDriveService {
       return true;
     } catch (error) {
       console.error('Error deleting file:', error);
+      
+      // Provide more helpful error messages for common network issues
+      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+        const networkError = new Error(
+          'Network connectivity issue: Cannot reach Google APIs. ' +
+          'Please check your internet connection, DNS settings, firewall, or proxy configuration. ' +
+          `Error: ${error.message}`
+        );
+        networkError.code = error.code;
+        networkError.originalError = error;
+        throw networkError;
+      }
+      
       throw error;
     }
   }

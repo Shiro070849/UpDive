@@ -66,10 +66,21 @@ const uploadController = {
 
     } catch (error) {
       console.error('Upload error:', error);
-      res.status(500).json({
+      
+      // Provide more specific error messages
+      let errorMessage = 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์';
+      let statusCode = 500;
+      
+      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+        errorMessage = 'ไม่สามารถเชื่อมต่อกับ Google Drive ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต DNS หรือ Firewall';
+        statusCode = 503; // Service Unavailable
+      }
+      
+      res.status(statusCode).json({
         success: false,
-        message: 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์',
-        error: error.message
+        message: errorMessage,
+        error: error.message,
+        code: error.code
       });
     }
   },
@@ -117,10 +128,21 @@ const uploadController = {
 
     } catch (error) {
       console.error('Multiple upload error:', error);
-      res.status(500).json({
+      
+      // Provide more specific error messages
+      let errorMessage = 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์';
+      let statusCode = 500;
+      
+      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+        errorMessage = 'ไม่สามารถเชื่อมต่อกับ Google Drive ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต DNS หรือ Firewall';
+        statusCode = 503; // Service Unavailable
+      }
+      
+      res.status(statusCode).json({
         success: false,
-        message: 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์',
-        error: error.message
+        message: errorMessage,
+        error: error.message,
+        code: error.code
       });
     }
   },
@@ -140,10 +162,21 @@ const uploadController = {
 
     } catch (error) {
       console.error('List files error:', error);
-      res.status(500).json({
+      
+      // Provide more specific error messages
+      let errorMessage = 'เกิดข้อผิดพลาดในการดึงรายการไฟล์';
+      let statusCode = 500;
+      
+      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+        errorMessage = 'ไม่สามารถเชื่อมต่อกับ Google Drive ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต DNS หรือ Firewall';
+        statusCode = 503; // Service Unavailable
+      }
+      
+      res.status(statusCode).json({
         success: false,
-        message: 'เกิดข้อผิดพลาดในการดึงรายการไฟล์',
-        error: error.message
+        message: errorMessage,
+        error: error.message,
+        code: error.code
       });
     }
   },
@@ -172,10 +205,21 @@ const uploadController = {
 
     } catch (error) {
       console.error('Delete file error:', error);
-      res.status(500).json({
+      
+      // Provide more specific error messages
+      let errorMessage = 'เกิดข้อผิดพลาดในการลบไฟล์';
+      let statusCode = 500;
+      
+      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+        errorMessage = 'ไม่สามารถเชื่อมต่อกับ Google Drive ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต DNS หรือ Firewall';
+        statusCode = 503; // Service Unavailable
+      }
+      
+      res.status(statusCode).json({
         success: false,
-        message: 'เกิดข้อผิดพลาดในการลบไฟล์',
-        error: error.message
+        message: errorMessage,
+        error: error.message,
+        code: error.code
       });
     }
   }
