@@ -1,9 +1,20 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-100 via-slate-200 to-slate-100 p-4 md:p-8 relative">
+  <div class="min-h-screen bg-gradient-to-br from-slate-100 via-slate-200 to-slate-100 relative">
+    <!-- Navbar -->
+    <Navbar
+      :user-name="userName"
+      :user-email="userEmail"
+      @logout="handleLogout"
+      @profile="handleProfile"
+      @settings="handleSettings"
+    />
+
     <!-- Background Gradient -->
     <div class="absolute top-0 left-0 right-0 h-[300px] bg-gradient-to-b from-blue-500/10 to-transparent pointer-events-none"></div>
 
-    <div class="max-w-[900px] mx-auto relative z-10">
+    <!-- Main Content -->
+    <div class="pt-20 px-4 pb-8 md:px-8">
+      <div class="max-w-[900px] mx-auto relative z-10">
       <!-- Header -->
       <div class="text-center mb-12">
         <div class="inline-flex items-center justify-center w-24 h-24 bg-white rounded-3xl mb-6 shadow-xl border border-blue-100 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300">
@@ -145,6 +156,7 @@
         </svg>
         <span>{{ errorMessage }}</span>
       </div>
+      </div>
     </div>
   </div>
 </template>
@@ -153,11 +165,13 @@
 import { ref } from 'vue';
 import uploadService from '../services/upload.service';
 import CloudLoader from '../components/CloudLoader.vue';
+import Navbar from '../components/Navbar.vue';
 
 export default {
   name: 'UploadView',
   components: {
-    CloudLoader
+    CloudLoader,
+    Navbar
   },
   setup() {
     const fileInput = ref(null);
@@ -167,6 +181,10 @@ export default {
     const isUploading = ref(false);
     const uploadProgress = ref(0);
     const errorMessage = ref('');
+
+    // User info (will be replaced with actual auth data later)
+    const userName = ref('User');
+    const userEmail = ref('user@example.com');
 
     const triggerFileInput = () => {
       fileInput.value.click();
@@ -242,6 +260,22 @@ export default {
       return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
     };
 
+    // Navbar event handlers (will be implemented with auth system)
+    const handleLogout = () => {
+      console.log('Logout clicked');
+      // TODO: Implement logout logic
+    };
+
+    const handleProfile = () => {
+      console.log('Profile clicked');
+      // TODO: Navigate to profile page
+    };
+
+    const handleSettings = () => {
+      console.log('Settings clicked');
+      // TODO: Open settings modal or navigate to settings page
+    };
+
     return {
       fileInput,
       selectedFiles,
@@ -250,12 +284,17 @@ export default {
       isUploading,
       uploadProgress,
       errorMessage,
+      userName,
+      userEmail,
       triggerFileInput,
       handleFileSelect,
       handleDrop,
       removeFile,
       uploadFiles,
-      formatFileSize
+      formatFileSize,
+      handleLogout,
+      handleProfile,
+      handleSettings
     };
   }
 };
