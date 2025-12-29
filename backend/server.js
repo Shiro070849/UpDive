@@ -66,6 +66,7 @@ app.get("/", (req, res) => {
 require("./routes/auth.routes")(app);
 require("./routes/upload.routes")(app);
 require("./routes/diagnostics.routes")(app);
+app.use('/api/chat', require('./routes/chat.routes'));
 
 // 404 handler
 app.use((req, res) => {

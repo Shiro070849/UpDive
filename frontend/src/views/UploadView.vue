@@ -330,6 +330,9 @@
         </div>
       </div>
     </div>
+
+    <!-- AI Chatbot -->
+    <ChatBot />
   </div>
 </template>
 
@@ -338,11 +341,13 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import uploadService from '../services/upload.service';
 import Navbar from '../components/Navbar.vue';
+import ChatBot from '../components/ChatBot.vue';
 
 export default {
   name: 'UploadView',
   components: {
-    Navbar
+    Navbar,
+    ChatBot
   },
   setup() {
     const router = useRouter();
@@ -514,8 +519,7 @@ export default {
     };
 
     const handleProfile = () => {
-      console.log('Profile clicked');
-      // TODO: Navigate to profile page
+      router.push('/profile');
     };
 
     const handleSettings = () => {
