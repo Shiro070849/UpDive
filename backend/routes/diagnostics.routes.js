@@ -9,3 +9,4 @@ module.exports = (app) => {
   app.get('/api/diagnostics/network', diagnosticsController.networkDiagnostics);
 };
 
+

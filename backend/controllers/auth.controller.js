@@ -1,11 +1,121 @@
 /**
  * Auth Controller
- * Handles Google OAuth authorization (for getting refresh token only)
+ * Handles both user authentication and Google OAuth authorization
  */
 
 const googleDriveService = require('../services/googleDrive.service');
+const { validateCredentials } = require('../data/users');
+const { generateToken, verifyToken } = require('../utils/jwt');
 
 const authController = {
+  /**
+   * User Login
+   * POST /api/auth/login
+   */
+  login: (req, res) => {
+    try {
+      const { username, password } = req.body;
+
+      // Validate input
+      if (!username || !password) {
+        return res.status(400).json({
+          success: false,
+          message: 'Username and password are required'
+        });
+      }
+
+      // Validate credentials
+      const user = validateCredentials(username, password);
+
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid username or password'
+        });
+      }
+
+      // Generate JWT token
+      const token = generateToken({
+        userId: user.id,
+        username: user.username,
+        role: user.role
+      }, '24h');
+
+      // Return success response
+      res.json({
+        success: true,
+        token,
+        user: {
+          id: user.id,
+          username: user.username,
+          fullName: user.fullName,
+          role: user.role,
+          email: user.email
+        }
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
+    }
+  },
+
+  /**
+   * Verify Token
+   * GET /api/auth/verify
+   */
+  verifyUserToken: (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({
+          success: false,
+          message: 'No token provided'
+        });
+      }
+
+      const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+      const payload = verifyToken(token);
+
+      if (!payload) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid or expired token',
+          code: 'AUTH_EXPIRED'
+        });
+      }
+
+      res.json({
+        success: true,
+        user: {
+          userId: payload.userId,
+          username: payload.username,
+          role: payload.role
+        }
+      });
+    } catch (error) {
+      console.error('Token verification error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error'
+      });
+    }
+  },
+
+  /**
+   * Logout (client-side will remove token)
+   * POST /api/auth/logout
+   */
+  logout: (req, res) => {
+    res.json({
+      success: true,
+      message: 'Logged out successfully'
+    });
+  },
   /**
    * Get Google OAuth URL
    * GET /api/auth/google
@@ -14,10 +124,109 @@ const authController = {
     try {
       const authUrl = googleDriveService.getAuthUrl();
 
-      res.json({
-        success: true,
-        authUrl: authUrl
-      });
+      // Return HTML page with clickable link
+      res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Google Drive Authorization</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              max-width: 800px;
+              margin: 50px auto;
+              padding: 20px;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              min-height: 100vh;
+            }
+            .container {
+              background: white;
+              padding: 40px;
+              border-radius: 12px;
+              box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            }
+            h1 {
+              color: #667eea;
+              margin-bottom: 10px;
+            }
+            .subtitle {
+              color: #666;
+              margin-bottom: 30px;
+            }
+            .step {
+              background: #f8f9fa;
+              padding: 15px;
+              margin: 15px 0;
+              border-left: 4px solid #667eea;
+              border-radius: 4px;
+            }
+            .step h3 {
+              margin-top: 0;
+              color: #667eea;
+            }
+            .auth-btn {
+              display: inline-block;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              padding: 15px 30px;
+              border-radius: 8px;
+              text-decoration: none;
+              font-size: 18px;
+              font-weight: bold;
+              box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+              transition: all 0.3s ease;
+              margin: 20px 0;
+            }
+            .auth-btn:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            }
+            .warning {
+              background: #fff3cd;
+              border: 1px solid #ffc107;
+              padding: 15px;
+              border-radius: 4px;
+              margin: 20px 0;
+            }
+            .emoji {
+              font-size: 24px;
+              margin-right: 10px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1><span class="emoji">🔐</span>Google Drive Authorization</h1>
+            <p class="subtitle">สร้าง Refresh Token ใหม่สำหรับเชื่อมต่อ Google Drive</p>
+
+            <div class="step">
+              <h3>📋 ขั้นตอนการทำ:</h3>
+              <ol>
+                <li>คลิกปุ่มด้านล่างเพื่อไปยังหน้า Google Authorization</li>
+                <li>เลือก Google Account ที่ต้องการใช้</li>
+                <li>กด "อนุญาต" (Allow) ให้แอปเข้าถึง Google Drive</li>
+                <li>ระบบจะ redirect กลับมาพร้อม Refresh Token ใหม่</li>
+                <li>Copy token ไปใส่ในไฟล์ .env แล้ว restart server</li>
+              </ol>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${authUrl}" class="auth-btn">
+                <span class="emoji">🚀</span> เริ่มต้น Authorization
+              </a>
+            </div>
+
+            <div class="warning">
+              <strong>⚠️ หมายเหตุ:</strong> หลังจากได้ Refresh Token แล้ว อย่าลืม:
+              <ul>
+                <li>วาง token ใน <code>backend/.env</code> ที่บรรทัด <code>GOOGLE_REFRESH_TOKEN=</code></li>
+                <li>Restart backend server (กด Ctrl+C แล้วรัน <code>node server.js</code> ใหม่)</li>
+              </ul>
+            </div>
+          </div>
+        </body>
+        </html>
+      `);
     } catch (error) {
       console.error('Error generating auth URL:', error);
       res.status(500).json({

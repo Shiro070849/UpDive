@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50/50 via-slate-50 to-blue-50/30 relative">
+  <div class="min-h-screen relative upload-wrapper">
     <!-- Navbar -->
     <Navbar
       :user-name="userName"
@@ -8,9 +8,6 @@
       @profile="handleProfile"
       @settings="handleSettings"
     />
-
-    <!-- Background Gradient -->
-    <div class="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-blue-100/30 via-blue-50/20 to-transparent pointer-events-none"></div>
 
     <!-- Main Content -->
     <div class="pt-24 md:pt-28 px-4 pb-16 md:px-8">
@@ -338,6 +335,7 @@
 
 <script>
 import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import uploadService from '../services/upload.service';
 import Navbar from '../components/Navbar.vue';
 
@@ -347,6 +345,7 @@ export default {
     Navbar
   },
   setup() {
+    const router = useRouter();
     const fileInput = ref(null);
     const selectedFiles = ref([]);
     const uploadedFiles = ref([]);
@@ -505,10 +504,13 @@ export default {
       }
     };
 
-    // Navbar event handlers (will be implemented with auth system)
+    // Navbar event handlers
     const handleLogout = () => {
-      console.log('Logout clicked');
-      // TODO: Implement logout logic
+      // Clear auth data
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      // Redirect to login
+      router.push('/login');
     };
 
     const handleProfile = () => {
@@ -591,3 +593,12 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.upload-wrapper {
+  background-image: url('@/assets/images/Dive_Bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+</style>

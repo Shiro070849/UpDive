@@ -1,14 +1,17 @@
 /**
  * Auth Routes
- * (Used only once to get refresh token)
+ * Handles user authentication and Google OAuth
  */
 
 const authController = require('../controllers/auth.controller');
 
 module.exports = (app) => {
-  // Get Google OAuth URL
-  app.get('/api/auth/google', authController.getAuthUrl);
+  // User Authentication
+  app.post('/api/auth/login', authController.login);
+  app.post('/api/auth/logout', authController.logout);
+  app.get('/api/auth/verify', authController.verifyUserToken);
 
-  // OAuth callback
+  // Google OAuth (for admin to get refresh token)
+  app.get('/api/auth/google', authController.getAuthUrl);
   app.get('/api/auth/google/callback', authController.handleCallback);
 };
