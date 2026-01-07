@@ -1,5 +1,5 @@
 <template>
-  <div class="chatbot-container">
+  <div v-if="isAuthorized" class="chatbot-container">
     <!-- Chat Window -->
     <transition name="chat-slide">
       <div v-if="isOpen" class="chat-window">
@@ -123,7 +123,7 @@
 </template>
 
 <script>
-import { ref, nextTick, onMounted, watch } from 'vue';
+import { ref, nextTick, onMounted, watch, computed } from 'vue';
 import axios from 'axios';
 
 export default {
@@ -135,6 +135,12 @@ export default {
     const isTyping = ref(false);
     const messagesContainer = ref(null);
     const unreadCount = ref(0);
+
+    // Check if user is authorized to use chatbot
+    const isAuthorized = computed(() => {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      return user.username === 'sysadmin';
+    });
 
     // Load messages from localStorage on mount
     onMounted(() => {
@@ -284,6 +290,7 @@ export default {
       isTyping,
       messagesContainer,
       unreadCount,
+      isAuthorized,
       toggleChat,
       closeChat,
       clearHistory,
@@ -351,8 +358,8 @@ export default {
   position: absolute;
   bottom: 80px;
   right: 0;
-  width: 380px;
-  height: 550px;
+  width: 340px;
+  height: 480px;
   background: white;
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
@@ -365,7 +372,7 @@ export default {
 .chat-header {
   background: linear-gradient(135deg, #5B9BD5 0%, #4A8BC2 100%);
   color: white;
-  padding: 1.25rem;
+  padding: 0.875rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -378,8 +385,8 @@ export default {
 }
 
 .ai-icon {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   display: flex;
@@ -387,13 +394,18 @@ export default {
   justify-content: center;
 }
 
+.ai-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
 .chat-title {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.875rem;
 }
 
 .chat-status {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   opacity: 0.9;
 }
 
@@ -423,36 +435,37 @@ export default {
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: 1rem;
   background: #f8f9fa;
 }
 
 .welcome-message {
   text-align: center;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
   color: #5A5A5A;
 }
 
 .welcome-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .welcome-message h3 {
-  font-size: 1.25rem;
-  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.375rem;
   color: #5B9BD5;
 }
 
 .welcome-message p {
-  margin: 0.25rem 0;
+  margin: 0.125rem 0;
+  font-size: 0.8125rem;
   color: #78858F;
 }
 
 .message {
   display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .message.user {
@@ -460,8 +473,8 @@ export default {
 }
 
 .message-avatar {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   background: linear-gradient(135deg, #5B9BD5 0%, #4A8BC2 100%);
   border-radius: 50%;
   display: flex;
@@ -471,17 +484,23 @@ export default {
   flex-shrink: 0;
 }
 
+.message-avatar svg {
+  width: 16px;
+  height: 16px;
+}
+
 .message-content {
-  max-width: 70%;
+  max-width: 75%;
 }
 
 .message-text {
   background: white;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   word-wrap: break-word;
-  line-height: 1.6;
+  line-height: 1.5;
+  font-size: 0.8125rem;
 }
 
 /* Message formatting styles */
@@ -544,19 +563,19 @@ export default {
 }
 
 .message-time {
-  font-size: 0.7rem;
+  font-size: 0.625rem;
   color: #999;
-  margin-top: 0.25rem;
-  padding: 0 0.5rem;
+  margin-top: 0.125rem;
+  padding: 0 0.375rem;
 }
 
 /* Typing Indicator */
 .typing-dots {
   display: flex;
-  gap: 4px;
-  padding: 0.75rem 1rem;
+  gap: 3px;
+  padding: 0.5rem 0.75rem;
   background: white;
-  border-radius: 12px 12px 12px 0;
+  border-radius: 10px 10px 10px 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
@@ -589,22 +608,22 @@ export default {
 
 /* Input */
 .chat-input-container {
-  padding: 1rem;
+  padding: 0.75rem;
   background: white;
   border-top: 1px solid #e0e0e0;
 }
 
 .chat-input-form {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.375rem;
 }
 
 .chat-input {
   flex: 1;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   border: 2px solid #e0e0e0;
-  border-radius: 24px;
-  font-size: 0.9rem;
+  border-radius: 20px;
+  font-size: 0.8125rem;
   transition: border-color 0.2s;
 }
 
@@ -619,8 +638,8 @@ export default {
 }
 
 .send-btn {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: none;
   background: linear-gradient(135deg, #5B9BD5 0%, #4A8BC2 100%);
@@ -630,6 +649,11 @@ export default {
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+}
+
+.send-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .send-btn:hover:not(:disabled) {

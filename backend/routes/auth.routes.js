@@ -7,6 +7,7 @@ const authController = require('../controllers/auth.controller');
 
 module.exports = (app) => {
   // User Authentication
+  app.post('/api/auth/register', authController.register);
   app.post('/api/auth/login', authController.login);
   app.post('/api/auth/logout', authController.logout);
   app.get('/api/auth/verify', authController.verifyUserToken);

@@ -107,6 +107,64 @@ const authController = {
   },
 
   /**
+   * User Registration
+   * POST /api/auth/register
+   */
+  register: (req, res) => {
+    try {
+      const { fullName, email, username, password } = req.body;
+
+      // Validate input
+      if (!fullName || !email || !username || !password) {
+        return res.status(400).json({
+          success: false,
+          message: 'All fields are required'
+        });
+      }
+
+      // Validate password length
+      if (password.length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: 'Password must be at least 6 characters'
+        });
+      }
+
+      // Check if username already exists (using users from data/users.js)
+      const { findUserByUsername } = require('../data/users');
+      const existingUser = findUserByUsername(username);
+
+      if (existingUser) {
+        return res.status(409).json({
+          success: false,
+          message: 'Username already exists'
+        });
+      }
+
+      // In a real app, we would save to database here
+      // For now, just return success (data will be lost on server restart)
+      console.log('New user registered:', { fullName, email, username });
+
+      res.status(201).json({
+        success: true,
+        message: 'Account created successfully',
+        user: {
+          username,
+          fullName,
+          email
+        }
+      });
+    } catch (error) {
+      console.error('Registration error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
+    }
+  },
+
+  /**
    * Logout (client-side will remove token)
    * POST /api/auth/logout
    */

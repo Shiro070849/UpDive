@@ -6,11 +6,19 @@
 const users = [
   {
     id: 1,
-    username: 'admin',
-    password: 'admin1234', // In production, this should be hashed
-    fullName: 'Administrator',
+    username: 'sysadmin',
+    password: 'SyS@dm!n', // In production, this should be hashed
+    fullName: 'System Administrator',
     role: 'admin',
-    email: 'admin@example.com'
+    email: 'sysadmin@updive.com'
+  },
+  {
+    id: 2,
+    username: 'admin',
+    password: 'admin123', // In production, this should be hashed
+    fullName: 'Admin User',
+    role: 'user',
+    email: 'admin@updive.com'
   }
 ];
 
