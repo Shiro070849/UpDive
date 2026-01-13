@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-cover bg-center bg-no-repeat" style="background-image: url('@/assets/images/Dive_Bg.png')">
+  <div class="relative min-h-screen bg-center bg-no-repeat bg-cover" style="background-image: url('@/assets/images/Dive_Bg.png');">
     <!-- Navbar -->
     <Navbar
       :user-name="user?.fullName || user?.username"
@@ -10,82 +10,99 @@
     />
 
     <!-- Upload History Content -->
-    <div class="flex justify-center p-4 sm:p-8">
-      <div class="bg-white rounded-2xl shadow-xl w-full max-w-3xl flex flex-col max-h-[calc(100vh-140px)]">
-        <!-- Header -->
-        <div class="flex justify-between items-center p-4 sm:p-6 border-b border-gray-200 flex-wrap gap-4">
-          <div class="flex items-center gap-4">
-            <h2 class="text-xl sm:text-2xl font-semibold text-gray-800">Upload History</h2>
-            <span v-if="uploadHistory.length > 0" class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              {{ uploadHistory.length }} files
-            </span>
-          </div>
-          <div class="flex gap-3">
-            <button
-              @click="goToUpload"
-              class="px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-600 text-sm hover:bg-gray-100 hover:border-gray-400 transition-all"
-            >
-              Back to Upload
-            </button>
-            <button
-              @click="loadUploadHistory"
-              :disabled="loadingHistory"
-              class="px-4 py-2 border border-blue-500 rounded-lg bg-blue-500 text-white text-sm hover:bg-blue-600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {{ loadingHistory ? 'Loading...' : 'Refresh' }}
-            </button>
-          </div>
-        </div>
+    <div class="px-3 pt-16 pb-8 md:pt-20 md:px-6">
+      <div class="max-w-2xl mx-auto">
+        <div class="relative bg-white/85 backdrop-blur-xl rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.6)] border border-white/60 overflow-hidden">
+          <!-- Glassmorphism Overlay -->
+          <div class="absolute inset-0 pointer-events-none bg-gradient-to-br from-white/40 via-blue-50/10 to-white/30"></div>
+          <div class="relative z-10 p-3 md:p-4">
+            <!-- Header Section -->
+            <div class="bg-white/70 backdrop-blur-sm rounded-md p-2 md:p-2.5 mb-3 border border-slate-200/40 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="flex-shrink-0 w-7 h-7 bg-white/90 rounded-md flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-200/30">
+                    <svg class="w-4 h-4 text-blue-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" stroke-width="2"/>
+                      <polyline points="14 2 14 8 20 8" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                  </div>
+                  <div class="flex flex-col flex-1 min-w-0">
+                    <h2 class="text-sm font-semibold tracking-tight md:text-base text-slate-800">Upload History</h2>
+                    <p class="text-[11px] text-slate-500 font-normal mt-0.5">
+                      <span v-if="uploadHistory.length > 0" class="flex gap-3 text-[11px] text-slate-500" >{{ uploadHistory.length }} files uploaded</span>
+                      <span v-else>No files uploaded yet</span>
+                    </p>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button
+                    @click="goToUpload"
+                    class="px-3 py-1.5 border border-gray-300 rounded-lg bg-white text-gray-600 text-[11px] hover:bg-gray-100 hover:border-gray-400 transition-all"
+                  >
+                    Back to Upload
+                  </button>
+                  <button
+                    @click="loadUploadHistory"
+                    :disabled="loadingHistory"
+                    class="px-3 py-1.5 border border-blue-500 rounded-lg bg-blue-500 text-white text-[11px] hover:bg-blue-600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {{ loadingHistory ? 'Loading...' : 'Refresh' }}
+                  </button>
+                </div>
+              </div>
+            </div>
 
-        <!-- Content -->
-        <div class="flex-1 overflow-y-auto p-4">
-          <!-- Loading -->
-          <div v-if="loadingHistory" class="flex justify-center items-center h-72 text-gray-500">
-            Loading...
-          </div>
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto max-h-[calc(100vh-280px)]">
+              <!-- Loading -->
+              <div v-if="loadingHistory" class="flex items-center justify-center text-sm text-gray-500 h-60">
+                Loading...
+              </div>
 
-          <!-- Empty -->
-          <div v-else-if="uploadHistory.length === 0" class="flex flex-col justify-center items-center h-72 text-gray-400 gap-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-            <p class="text-base">No upload history yet</p>
-          </div>
-
-          <!-- List -->
-          <div v-else class="flex flex-col gap-3">
-            <div
-              v-for="log in uploadHistory"
-              :key="log.id"
-              class="flex items-center gap-4 p-4 rounded-xl bg-gray-50 hover:bg-gray-100 hover:translate-x-1 transition-all"
-            >
-              <!-- Icon -->
-              <div class="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg text-white flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <!-- Empty -->
+              <div v-else-if="uploadHistory.length === 0" class="flex flex-col items-center justify-center gap-3 text-gray-400 h-60">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                   <polyline points="14 2 14 8 20 8"></polyline>
                 </svg>
+                <p class="text-sm">No upload history yet</p>
               </div>
 
-              <!-- Info -->
-              <div class="flex-1 min-w-0">
-                <div class="text-base font-medium text-gray-800 truncate mb-1">{{ log.file_name }}</div>
-                <div class="flex gap-4 sm:gap-6 text-sm text-gray-500 flex-col sm:flex-row">
-                  <span>{{ formatFileSize(log.file_size) }}</span>
-                  <span>{{ formatDate(log.uploaded_at) }}</span>
+              <!-- List -->
+              <div v-else class="flex flex-col gap-2">
+                <div
+                  v-for="log in uploadHistory"
+                  :key="log.id"
+                  class="flex items-center gap-3 p-2.5 rounded-lg bg-white/60 backdrop-blur-sm border border-slate-200/50 hover:bg-white/80 hover:border-slate-300/60 hover:shadow-sm transition-all"
+                >
+                  <!-- Icon -->
+                  <div class="flex items-center justify-center flex-shrink-0 w-10 h-10 text-white rounded-lg shadow-sm bg-gradient-to-br from-blue-500 to-blue-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                    </svg>
+                  </div>
+
+                  <!-- Info -->
+                  <div class="flex-1 min-w-0">
+                    <div class="text-[11px] font-medium text-slate-800 truncate mb-1">{{ log.file_name }}</div>
+                    <div class="flex gap-3 text-[11px] text-slate-500">
+                      <span class="flex gap-3 text-[11px] text-slate-500">{{ formatFileSize(log.file_size) }}</span>
+                      <span class="flex gap-3 text-[11px] text-slate-500">{{ formatDate(log.uploaded_at) }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Link -->
+                  <a
+                    v-if="log.drive_url"
+                    :href="log.drive_url"
+                    target="_blank"
+                    class="px-3 py-1.5 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg text-[11px] font-medium no-underline flex-shrink-0 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/40 transition-all"
+                  >
+                    View
+                  </a>
                 </div>
               </div>
-
-              <!-- Link -->
-              <a
-                v-if="log.drive_url"
-                :href="log.drive_url"
-                target="_blank"
-                class="px-5 py-2 bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg text-sm font-medium no-underline flex-shrink-0 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-500/40 transition-all"
-              >
-                View
-              </a>
             </div>
           </div>
         </div>
@@ -96,6 +113,7 @@
     <ChatBot />
   </div>
 </template>
+
 
 <script>
 import { ref, onMounted } from 'vue';
@@ -191,3 +209,12 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.upload-wrapper {
+  background-image: url('@/assets/images/Dive_Bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+</style>

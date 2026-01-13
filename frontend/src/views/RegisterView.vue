@@ -1,27 +1,27 @@
 <template>
   <div class="flex justify-center items-center min-h-screen bg-cover bg-center bg-no-repeat register-wrapper">
-    <div class="bg-white/90 backdrop-blur-lg rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.1)] py-6 px-7 w-full max-w-[320px] text-center">
+    <div class="bg-white/90 backdrop-blur-lg rounded-lg shadow-[0_8px_32px_rgba(0,0,0,0.1)] py-4 px-5 w-full max-w-[280px] text-center">
       <!-- Cloud Icon -->
-      <div class="mb-4 flex justify-center">
-        <svg width="36" height="27" viewBox="0 0 48 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <div class="mb-3 flex justify-center">
+        <svg width="30" height="22" viewBox="0 0 48 36" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M38.4 18C37.92 11.88 32.88 7 26.64 7C23.04 7 19.92 8.76 17.76 11.4C16.56 10.92 15.24 10.68 13.92 10.68C8.88 10.68 4.8 14.76 4.8 19.8C2.04 20.52 0 23.04 0 26.04C0 29.64 2.88 32.52 6.48 32.52H37.68C41.88 32.52 45.36 29.04 45.36 24.84C45.36 20.88 42.36 17.64 38.4 18Z" fill="#5B9BD5"/>
         </svg>
       </div>
 
       <!-- Title -->
-      <h1 class="text-base font-semibold text-gray-600 mb-4 tracking-normal">Create UpDive Account</h1>
+      <h1 class="text-sm font-semibold text-gray-600 mb-3 tracking-normal">Create UpDive Account</h1>
 
       <!-- Register Form -->
-      <form class="flex flex-col gap-2 mb-2" @submit.prevent="handleRegister">
+      <form class="flex flex-col gap-1.5 mb-1.5" @submit.prevent="handleRegister">
         <input
-          class="w-full h-9 border border-gray-300 rounded-lg px-3 text-sm text-gray-800 bg-gray-50 transition-all duration-200 focus:outline-none focus:border-[#5B9BD5] focus:bg-white placeholder:text-gray-400"
+          class="w-full h-8 border border-gray-300 rounded-lg px-2.5 text-[11px] text-gray-800 bg-gray-50 transition-all duration-200 focus:outline-none focus:border-[#5B9BD5] focus:bg-white placeholder:text-gray-400"
           v-model="fullName"
           placeholder="Full Name"
           type="text"
           required
         >
         <input
-          class="w-full h-9 border border-gray-300 rounded-lg px-3 text-sm text-gray-800 bg-gray-50 transition-all duration-200 focus:outline-none focus:border-[#5B9BD5] focus:bg-white placeholder:text-gray-400"
+          class="w-full h-8 border border-gray-300 rounded-lg px-2.5 text-[11px] text-gray-800 bg-gray-50 transition-all duration-200 focus:outline-none focus:border-[#5B9BD5] focus:bg-white placeholder:text-gray-400"
           v-model="username"
           placeholder="Username"
           type="text"
@@ -29,7 +29,7 @@
         >
         <div class="relative">
           <input
-            class="w-full h-9 border border-gray-300 rounded-lg px-3 pr-10 text-sm text-gray-800 bg-gray-50 transition-all duration-200 focus:outline-none focus:border-[#5B9BD5] focus:bg-white placeholder:text-gray-400"
+            class="w-full h-8 border border-gray-300 rounded-lg px-2.5 pr-8 text-[11px] text-gray-800 bg-gray-50 transition-all duration-200 focus:outline-none focus:border-[#5B9BD5] focus:bg-white placeholder:text-gray-400"
             v-model="password"
             placeholder="Password"
             :type="showPassword ? 'text' : 'password'"
@@ -38,13 +38,13 @@
           <button
             type="button"
             @click="showPassword = !showPassword"
-            class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+            class="absolute right-1.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <svg v-if="!showPassword" class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg v-if="!showPassword" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <svg v-else class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg v-else class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -53,7 +53,7 @@
 
         <div class="relative">
           <input
-            class="w-full h-9 border border-gray-300 rounded-lg px-3 pr-10 text-sm text-gray-800 bg-gray-50 transition-all duration-200 focus:outline-none focus:border-[#5B9BD5] focus:bg-white placeholder:text-gray-400"
+            class="w-full h-8 border border-gray-300 rounded-lg px-2.5 pr-8 text-[11px] text-gray-800 bg-gray-50 transition-all duration-200 focus:outline-none focus:border-[#5B9BD5] focus:bg-white placeholder:text-gray-400"
             v-model="confirmPassword"
             placeholder="Confirm Password"
             :type="showConfirmPassword ? 'text' : 'password'"
@@ -62,29 +62,29 @@
           <button
             type="button"
             @click="showConfirmPassword = !showConfirmPassword"
-            class="absolute right-2 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+            class="absolute right-1.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <svg v-if="!showConfirmPassword" class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg v-if="!showConfirmPassword" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <svg v-else class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg v-else class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
         </div>
 
-        <div v-if="errorMessage" class="text-red-500 text-xs font-medium py-1.5 px-2.5 bg-red-50 rounded-lg border border-red-500">
+        <div v-if="errorMessage" class="text-red-500 text-[11px] font-medium py-1 px-2 bg-red-50 rounded-lg border border-red-500">
           {{ errorMessage }}
         </div>
 
-        <div v-if="successMessage" class="text-green-600 text-xs font-medium py-1.5 px-2.5 bg-green-50 rounded-lg border border-green-500">
+        <div v-if="successMessage" class="text-green-600 text-[11px] font-medium py-1 px-2 bg-green-50 rounded-lg border border-green-500">
           {{ successMessage }}
         </div>
 
         <button
-          class="w-full h-9 bg-gradient-to-br from-[#5B9BD5] to-[#4A8BC2] text-white border-0 rounded-lg text-sm font-semibold cursor-pointer transition-all duration-300 mt-0.5 hover:bg-gradient-to-br hover:from-[#4A8BC2] hover:to-[#3A7BB2] hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(91,155,213,0.3)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed"
+          class="w-full h-8 bg-gradient-to-br from-[#5B9BD5] to-[#4A8BC2] text-white border-0 rounded-lg text-[11px] font-semibold cursor-pointer transition-all duration-300 mt-0.5 hover:bg-gradient-to-br hover:from-[#4A8BC2] hover:to-[#3A7BB2] hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(91,155,213,0.3)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed"
           type="submit"
           :disabled="isLoading"
         >
@@ -93,9 +93,9 @@
       </form>
 
       <!-- Login Link -->
-      <div class="mt-2 text-xs text-gray-500">
+      <div class="mt-1.5 text-[11px] text-gray-500">
         Already have an account?
-        <router-link to="/login" class="text-[#5B9BD5] text-xs font-medium hover:text-[#4A8BC2] hover:underline transition-all duration-200 ml-1">Sign in</router-link>
+        <router-link to="/login" class="text-[#5B9BD5] text-[11px] font-medium hover:text-[#4A8BC2] hover:underline transition-all duration-200 ml-0.5">Sign in</router-link>
       </div>
     </div>
   </div>

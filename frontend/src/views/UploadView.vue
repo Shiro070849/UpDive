@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen relative upload-wrapper">
+  <div class="relative min-h-screen upload-wrapper">
     <!-- Navbar -->
     <Navbar
       :user-name="userName"
@@ -10,18 +10,18 @@
     />
 
     <!-- Main Content -->
-    <div class="pt-20 md:pt-24 px-4 pb-12 md:px-8">
-      <div class="max-w-4xl mx-auto relative z-0">
+    <div class="px-3 pt-16 pb-8 md:pt-20 md:px-6">
+      <div class="relative z-0 max-w-3xl mx-auto">
         <!-- Main Content Card (Enhanced Glassmorphism) -->
-        <div class="relative bg-white/85 backdrop-blur-xl rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.6)] border border-white/60 p-4 md:p-5 overflow-hidden">
+        <div class="relative bg-white/85 backdrop-blur-xl rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.6)] border border-white/60 p-3 md:p-4 overflow-hidden">
           <!-- Glassmorphism Overlay -->
-          <div class="absolute inset-0 bg-gradient-to-br from-white/40 via-blue-50/10 to-white/30 pointer-events-none"></div>
+          <div class="absolute inset-0 pointer-events-none bg-gradient-to-br from-white/40 via-blue-50/10 to-white/30"></div>
           <div class="relative z-10">
           <!-- Header Section (Small box at top) -->
-          <div class="bg-white/70 backdrop-blur-sm rounded-lg p-2.5 md:p-3 mb-5 border border-slate-200/40 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <div class="flex items-center gap-2.5">
-              <div class="flex-shrink-0 w-9 h-9 bg-white/90 rounded-lg flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-200/30">
-                <svg class="w-5 h-5" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
+          <div class="bg-white/70 backdrop-blur-sm rounded-md p-2 md:p-2.5 mb-3 border border-slate-200/40 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            <div class="flex items-center gap-2">
+              <div class="flex-shrink-0 w-7 h-7 bg-white/90 rounded-md flex items-center justify-center shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-slate-200/30">
+                <svg class="w-4 h-4" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
                   <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5l5.4 9.35z" fill="#0066da"/>
                   <path d="M43.65 25L29.9 1.2c-1.35.8-2.5 1.9-3.3 3.3L1.2 52.35c-.8 1.4-1.2 2.95-1.2 4.5h27.5l16.15-31.85z" fill="#00ac47"/>
                   <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.85L73.55 76.8z" fill="#ea4335"/>
@@ -31,15 +31,15 @@
                 </svg>
               </div>
               <div class="flex-1 min-w-0">
-                <h1 class="text-base md:text-lg font-semibold text-slate-800 mb-0.5 tracking-tight">Upload files to Google Drive</h1>
-                <p class="text-xs text-slate-500 font-normal">Securely store your files in Google Drive</p>
+                <h1 class="text-sm md:text-base font-semibold text-slate-800 mb-0.5 tracking-tight">Upload files to Google Drive</h1>
+                <p class="text-[11px] text-slate-500 font-normal">Securely store your files in Google Drive</p>
               </div>
             </div>
           </div>
 
           <!-- Upload Zone - HERO Section with Glassmorphism -->
           <div
-            class="relative rounded-xl p-4 md:p-5 text-center transition-all duration-300 cursor-pointer mb-5"
+            class="relative p-3 mb-3 text-center transition-all duration-300 rounded-lg cursor-pointer md:p-4"
             :class="{
               'cursor-not-allowed': isUploading
             }"
@@ -51,11 +51,11 @@
             <input ref="fileInput" type="file" multiple @change="handleFileSelect" class="hidden" />
 
             <!-- Layered Glassmorphism Background -->
-            <div class="absolute inset-0 rounded-xl bg-gradient-to-br from-white/40 via-blue-50/20 to-white/50 backdrop-blur-lg border border-white/60 shadow-[0_4px_16px_rgba(59,130,246,0.08)]"></div>
+            <div class="absolute inset-0 rounded-lg bg-gradient-to-br from-white/40 via-blue-50/20 to-white/50 backdrop-blur-lg border border-white/60 shadow-[0_4px_16px_rgba(59,130,246,0.08)]"></div>
 
             <!-- Inner Glow Layer -->
             <div
-              class="absolute inset-[1px] rounded-xl"
+              class="absolute inset-[1px] rounded-lg"
               :class="{
                 'bg-gradient-to-br from-blue-100/15 via-white/25 to-blue-50/15 shadow-[inset_0_1px_12px_rgba(59,130,246,0.1),inset_0_0_24px_rgba(255,255,255,0.4)]': !isDragging && !isUploading,
                 'bg-gradient-to-br from-blue-200/30 via-blue-100/40 to-blue-200/25 shadow-[inset_0_2px_18px_rgba(59,130,246,0.2),inset_0_0_32px_rgba(255,255,255,0.5)]': isDragging,
@@ -64,7 +64,7 @@
             ></div>
 
             <!-- Subtle Border Accent (replacing dashed border) -->
-            <div class="absolute inset-0 rounded-xl border border-transparent" :class="{
+            <div class="absolute inset-0 border border-transparent rounded-lg" :class="{
               'border-blue-300/25': !isDragging && !isUploading,
               'border-blue-400/40': isDragging,
               'border-slate-200/20': isUploading
@@ -73,14 +73,14 @@
             <!-- Upload Content -->
             <div v-if="!isUploading" class="relative z-10">
               <!-- Icon Container - Glassmorphism Style -->
-              <div class="w-12 h-12 mx-auto mb-3 flex items-center justify-center relative">
+              <div class="relative flex items-center justify-center w-10 h-10 mx-auto mb-2">
                 <!-- Subtle Blue Glow -->
-                <div class="absolute inset-0 bg-blue-400/15 rounded-lg blur-md"></div>
+                <div class="absolute inset-0 rounded-md bg-blue-400/15 blur-md"></div>
 
                 <!-- Glassmorphism Container -->
-                <div class="relative w-12 h-12 bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/80 shadow-[0_2px_6px_rgba(59,130,246,0.1),0_0_0_1px_rgba(59,130,246,0.06),inset_0_1px_2px_rgba(255,255,255,0.9)]">
+                <div class="relative w-10 h-10 bg-white/90 backdrop-blur-sm rounded-md flex items-center justify-center border border-white/80 shadow-[0_2px_6px_rgba(59,130,246,0.1),0_0_0_1px_rgba(59,130,246,0.06),inset_0_1px_2px_rgba(255,255,255,0.9)]">
                   <!-- Modern Upload Icon -->
-                  <svg class="w-6 h-6 text-blue-600 transition-all duration-300" :class="{ 'text-blue-700 scale-105': isDragging }" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg class="w-5 h-5 text-blue-600 transition-all duration-300" :class="{ 'text-blue-700 scale-105': isDragging }" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -88,14 +88,14 @@
                 </div>
               </div>
 
-              <p class="text-xs md:text-sm font-medium text-slate-700 mb-3">Drag & drop files here, or</p>
+              <p class="text-[11px] md:text-xs font-medium text-slate-700 mb-2">Drag & drop files here, or</p>
 
               <!-- Medium-sized Elegant Button -->
               <button
                 @click.stop="triggerFileInput"
-                class="relative inline-flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-1.5 rounded-lg text-xs font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-[0_3px_10px_rgba(59,130,246,0.25),0_0_0_1px_rgba(255,255,255,0.1)_inset] hover:shadow-[0_4px_12px_rgba(59,130,246,0.35),0_0_0_1px_rgba(255,255,255,0.15)_inset]"
+                class="relative inline-flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-3 py-1.5 rounded-md text-[11px] font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-[0_3px_10px_rgba(59,130,246,0.25),0_0_0_1px_rgba(255,255,255,0.1)_inset] hover:shadow-[0_4px_12px_rgba(59,130,246,0.35),0_0_0_1px_rgba(255,255,255,0.15)_inset]"
               >
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M13 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V9L13 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   <path d="M13 2V9H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -105,69 +105,69 @@
           </div>
 
           <!-- Upload Status Section (แสดงเฉพาะตอนกำลังอัปโหลด) -->
-          <div v-if="isUploading && uploadingFiles.length > 0" class="mt-4 bg-white/60 backdrop-blur-sm rounded-lg p-3.5 border border-slate-200/50 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div v-if="isUploading && uploadingFiles.length > 0" class="mt-3 bg-white/60 backdrop-blur-sm rounded-md p-2.5 border border-slate-200/50 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-1.5">
+                <svg class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M3 7V5C3 3.89543 3.89543 3 5 3H9.58579C9.851 3 10.1054 3.10536 10.2929 3.29289L12.7071 5.70711C12.8946 5.89464 13.149 6 13.4142 6H19C20.1046 6 21 6.89543 21 8V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <p class="text-xs text-slate-500">
-                  Uploading to: <span class="font-medium text-slate-700">{{ currentFolderPath }}</span>
+                <p class="text-[11px] text-slate-500">
+                  Uploading to: <span class="flex gap-3 text-[11px] text-slate-500">{{ currentFolderPath }}</span>
                 </p>
               </div>
               <button
                 @click="openFolderModal"
-                class="text-xs text-blue-500 hover:text-blue-600 font-medium transition-colors"
+                class="text-[11px] text-blue-500 hover:text-blue-600 font-medium transition-colors"
               >
                 Change Folder
               </button>
             </div>
 
             <!-- Uploading Files List -->
-            <div class="space-y-2 mb-4">
-              <div v-for="(file, index) in uploadingFiles" :key="file.id || index" class="bg-white/80 rounded-lg p-3 border border-slate-200/60">
-                <div class="flex items-center gap-2.5 mb-2">
-                  <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg" :class="file.status === 'completed' ? 'bg-green-50 text-green-600' : getFileIconClass(file.name)">
-                    <svg v-if="file.status === 'completed'" class="w-4 h-4 text-green-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div class="space-y-1.5 mb-2">
+              <div v-for="(file, index) in uploadingFiles" :key="file.id || index" class="p-2 border rounded-md bg-white/80 border-slate-200/60">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <div class="flex items-center justify-center flex-shrink-0 w-6 h-6 rounded-md" :class="file.status === 'completed' ? 'bg-green-50 text-green-600' : getFileIconClass(file.name)">
+                    <svg v-if="file.status === 'completed'" class="w-3.5 h-3.5 text-green-600" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M9 11L12 14L22 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                       <path d="M21 12V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <svg v-else-if="getFileIcon(file.name) === 'pdf'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg v-else-if="getFileIcon(file.name) === 'pdf'" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       <path d="M14 2V8H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       <path d="M16 13H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                       <path d="M16 17H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
                       <path d="M10 9H9H8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <svg v-else-if="getFileIcon(file.name) === 'image'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg v-else-if="getFileIcon(file.name) === 'image'" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       <circle cx="8.5" cy="8.5" r="1.5" stroke="currentColor" stroke-width="1.5"/>
                       <path d="M21 15L16 10L5 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <svg v-else-if="getFileIcon(file.name) === 'video'" class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg v-else-if="getFileIcon(file.name) === 'video'" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M23 7L16 12L23 17V7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       <path d="M14 5H3C1.89543 5 1 5.89543 1 7V17C1 18.1046 1.89543 19 3 19H14C15.1046 19 16 18.1046 16 17V7C16 5.89543 15.1046 5 14 5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    <svg v-else class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg v-else class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                       <path d="M14 2V8H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <div class="text-xs font-medium text-slate-700 truncate mb-0.5">{{ file.name }}</div>
-                    <div v-if="file.status === 'uploading'" class="text-[10px] text-slate-500">{{ formatFileSize(file.uploaded || 0) }} / {{ formatFileSize(file.size) }}</div>
-                    <div v-else-if="file.status === 'completed'" class="text-[10px] text-green-600 font-medium">Upload completed</div>
-                    <div v-else class="text-[10px] text-red-500 font-medium">Upload failed</div>
+                    <div class="text-[11px] font-medium text-slate-700 truncate mb-0.5">{{ file.name }}</div>
+                    <div v-if="file.status === 'uploading'" class="text-[9px] text-slate-500">{{ formatFileSize(file.uploaded || 0) }} / {{ formatFileSize(file.size) }}</div>
+                    <div v-else-if="file.status === 'completed'" class="text-[9px] text-green-600 font-medium">Upload completed</div>
+                    <div v-else class="text-[9px] text-red-500 font-medium">Upload failed</div>
                   </div>
-                  <div v-if="file.status === 'uploading'" class="flex-shrink-0 text-xs font-medium text-slate-600">{{ file.progress || 0 }}%</div>
-                  <div v-else-if="file.status === 'completed'" class="flex items-center gap-3">
-                    <a v-if="getCompletedFileLink(file.name)" :href="getCompletedFileLink(file.name)" target="_blank" class="text-xs text-blue-500 hover:text-blue-600 font-medium">Open in Drive</a>
-                    <button v-if="getCompletedFileLink(file.name)" @click.stop="copyFileLink(file.name)" class="text-xs text-slate-500 hover:text-slate-600 font-medium">Copy Link</button>
+                  <div v-if="file.status === 'uploading'" class="flex-shrink-0 text-[11px] font-medium text-slate-600">{{ file.progress || 0 }}%</div>
+                  <div v-else-if="file.status === 'completed'" class="flex items-center gap-2">
+                    <a v-if="getCompletedFileLink(file.name)" :href="getCompletedFileLink(file.name)" target="_blank" class="text-[11px] text-blue-500 hover:text-blue-600 font-medium">Open in Drive</a>
+                    <button v-if="getCompletedFileLink(file.name)" @click.stop="copyFileLink(file.name)" class="text-[11px] text-slate-500 hover:text-slate-600 font-medium">Copy Link</button>
                   </div>
                 </div>
-                <div v-if="file.status === 'uploading'" class="w-full h-1 bg-slate-200/80 rounded-full overflow-hidden">
+                <div v-if="file.status === 'uploading'" class="w-full h-0.5 bg-slate-200/80 rounded-full overflow-hidden">
                   <div
-                    class="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full transition-all duration-300"
+                    class="h-full transition-all duration-300 rounded-full bg-gradient-to-r from-blue-400 to-blue-500"
                     :style="{ width: (file.progress || 0) + '%' }"
                   ></div>
                 </div>
@@ -175,28 +175,28 @@
             </div>
 
             <!-- Total Progress (แสดงเฉพาะเมื่อมีหลายไฟล์) -->
-            <div v-if="uploadingFiles.length > 1" class="bg-slate-50/60 rounded-xl p-4 border border-slate-200/40 mb-4">
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-medium text-slate-600">Total progress</span>
-                <span class="text-sm font-medium text-slate-700">{{ totalProgress }}%</span>
+            <div v-if="uploadingFiles.length > 1" class="bg-slate-50/60 rounded-md p-2.5 border border-slate-200/40 mb-2">
+              <div class="flex items-center justify-between mb-1.5">
+                <span class="text-[11px] font-medium text-slate-600">Total progress</span>
+                <span class="text-[11px] font-medium text-slate-700">{{ totalProgress }}%</span>
               </div>
-              <div class="w-full h-1 bg-slate-200/80 rounded-full overflow-hidden">
+              <div class="w-full h-0.5 bg-slate-200/80 rounded-full overflow-hidden">
                 <div
-                  class="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full transition-all duration-300"
+                  class="h-full transition-all duration-300 rounded-full bg-gradient-to-r from-blue-400 to-blue-500"
                   :style="{ width: totalProgress + '%' }"
                 ></div>
               </div>
             </div>
 
             <!-- Clear List Button -->
-            <div class="flex justify-end pt-3 border-t border-slate-200/40">
+            <div class="flex justify-end pt-2 border-t border-slate-200/40">
               <button
                 @click="clearCompletedFiles"
-                class="text-sm text-slate-500 hover:text-slate-700 font-medium transition-colors flex items-center gap-1.5"
+                class="text-[11px] text-slate-500 hover:text-slate-700 font-medium transition-colors flex items-center gap-1"
                 :disabled="completedFilesCount === 0"
               >
-                <span>Clear completed</span>
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <span class="flex gap-3 text-[11px] text-slate-500" >Clear completed</span>
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M9 18L15 12L9 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </button>
@@ -204,32 +204,32 @@
           </div>
 
           <!-- Selected Files -->
-          <div v-if="selectedFiles.length > 0 && !isUploading" class="mt-4 bg-white/60 backdrop-blur-sm rounded-lg p-3.5 border border-slate-200/50 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <div class="flex items-center justify-between mb-3 pb-3 border-b border-slate-200/40">
-              <h3 class="text-sm font-semibold text-slate-700">Selected Files</h3>
-              <span class="text-xs text-slate-500 bg-slate-100/60 px-2 py-0.5 rounded-full font-medium">{{ selectedFiles.length }} {{ selectedFiles.length === 1 ? 'file' : 'files' }}</span>
+          <div v-if="selectedFiles.length > 0 && !isUploading" class="mt-3 bg-white/60 backdrop-blur-sm rounded-md p-2.5 border border-slate-200/50 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/40">
+              <h3 class="text-xs font-semibold text-slate-700">Selected Files</h3>
+              <span class="text-[10px] text-slate-500 bg-slate-100/60 px-2 py-0.5 rounded-full font-medium">{{ selectedFiles.length }} {{ selectedFiles.length === 1 ? 'file' : 'files' }}</span>
             </div>
-            <div class="flex flex-col gap-2 mb-4">
-              <div v-for="(file, index) in selectedFiles" :key="index" class="flex items-center gap-3 p-3 bg-white/70 rounded-lg border border-slate-200/50 hover:border-slate-300/60 transition-all duration-200">
-                <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-blue-50/80 rounded-lg text-blue-500">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div class="flex flex-col gap-1.5 mb-2">
+              <div v-for="(file, index) in selectedFiles" :key="index" class="flex items-center gap-2 p-2 transition-all duration-200 border rounded-md bg-white/70 border-slate-200/50 hover:border-slate-300/60">
+                <div class="flex items-center justify-center flex-shrink-0 w-6 h-6 text-blue-500 rounded-md bg-blue-50/80">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M13 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V9L13 2Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M13 2V9H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <div class="text-xs font-medium text-slate-700 truncate">{{ file.name }}</div>
-                  <div class="text-[10px] text-slate-500 mt-0.5">{{ formatFileSize(file.size) }}</div>
+                  <div class="text-[11px] font-medium text-slate-700 truncate">{{ file.name }}</div>
+                  <div class="text-[9px] text-slate-500 mt-0.5">{{ formatFileSize(file.size) }}</div>
                 </div>
-                <button @click.stop="removeFile(index)" class="flex-shrink-0 w-7 h-7 flex items-center justify-center bg-red-50/80 text-red-500 rounded-lg hover:bg-red-100/80 transition-all duration-200" title="Remove file">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <button @click.stop="removeFile(index)" class="flex items-center justify-center flex-shrink-0 w-6 h-6 text-red-500 transition-all duration-200 rounded-md bg-red-50/80 hover:bg-red-100/80" title="Remove file">
+                  <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                 </button>
               </div>
             </div>
-            <button @click="uploadFiles" class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium hover:from-blue-600 hover:to-blue-700 hover:shadow-[0_2px_6px_rgba(59,130,246,0.25)] transition-all duration-200 shadow-[0_1px_3px_rgba(59,130,246,0.2)]">
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <button @click="uploadFiles" class="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white py-1.5 px-3 rounded-md text-[11px] font-medium hover:from-blue-600 hover:to-blue-700 hover:shadow-[0_2px_6px_rgba(59,130,246,0.25)] transition-all duration-200 shadow-[0_1px_3px_rgba(59,130,246,0.2)]">
+              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M17 8L12 3L7 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 <path d="M12 3V15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -239,25 +239,25 @@
           </div>
 
           <!-- Uploaded Files -->
-          <div v-if="uploadedFiles.length > 0 && !isUploading" class="mt-4 bg-white/60 backdrop-blur-sm rounded-lg p-3.5 border border-slate-200/50 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <div class="flex items-center justify-between mb-3 pb-3 border-b border-slate-200/40">
-              <h3 class="text-sm font-semibold text-slate-700">Uploaded Files</h3>
-              <span class="text-xs text-green-600 bg-green-50/60 px-2 py-0.5 rounded-full font-medium">{{ uploadedFiles.length }} {{ uploadedFiles.length === 1 ? 'file' : 'files' }}</span>
+          <div v-if="uploadedFiles.length > 0 && !isUploading" class="mt-3 bg-white/60 backdrop-blur-sm rounded-md p-2.5 border border-slate-200/50 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/40">
+              <h3 class="text-xs font-semibold text-slate-700">Uploaded Files</h3>
+              <span class="text-[10px] text-green-600 bg-green-50/60 px-2 py-0.5 rounded-full font-medium">{{ uploadedFiles.length }} {{ uploadedFiles.length === 1 ? 'file' : 'files' }}</span>
             </div>
-            <div class="flex flex-col gap-2">
-              <div v-for="file in uploadedFiles" :key="file.id" class="flex flex-wrap items-center gap-3 p-3 bg-white/70 rounded-lg border border-green-200/40 hover:border-green-300/60 transition-all duration-200">
-                <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-green-50/80 rounded-lg text-green-600">
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <div class="flex flex-col gap-1.5">
+              <div v-for="file in uploadedFiles" :key="file.id" class="flex flex-wrap items-center gap-2 p-2 transition-all duration-200 border rounded-md bg-white/70 border-green-200/40 hover:border-green-300/60">
+                <div class="flex items-center justify-center flex-shrink-0 w-6 h-6 text-green-600 rounded-md bg-green-50/80">
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M9 11L12 14L22 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M21 12V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                 </div>
                 <div class="flex-1 min-w-0">
-                  <div class="text-xs font-medium text-slate-700 truncate">{{ file.name }}</div>
-                  <div class="text-[10px] text-slate-500 mt-0.5">{{ formatFileSize(file.size) }}</div>
+                  <div class="text-[11px] font-medium text-slate-700 truncate">{{ file.name }}</div>
+                  <div class="text-[9px] text-slate-500 mt-0.5">{{ formatFileSize(file.size) }}</div>
                 </div>
-                <a :href="file.webViewLink" target="_blank" class="flex-shrink-0 flex items-center gap-1.5 bg-white text-slate-600 px-3 py-1.5 rounded-lg text-[0.625rem] font-medium border border-slate-200/60 hover:bg-slate-50/80 hover:border-slate-300/60 transition-all duration-200 sm:w-auto w-full justify-center mt-2 sm:mt-0">
-                  <svg class="w-3.5 h-3.5" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
+                <a :href="file.webViewLink" target="_blank" class="flex-shrink-0 flex items-center gap-1 bg-white text-slate-600 px-2 py-1 rounded-md text-[10px] font-medium border border-slate-200/60 hover:bg-slate-50/80 hover:border-slate-300/60 transition-all duration-200 sm:w-auto w-full justify-center mt-2 sm:mt-0">
+                  <svg class="w-3 h-3" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
                     <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5l5.4 9.35z" fill="#0066da"/>
                     <path d="M43.65 25L29.9 1.2c-1.35.8-2.5 1.9-3.3 3.3L1.2 52.35c-.8 1.4-1.2 2.95-1.2 4.5h27.5l16.15-31.85z" fill="#00ac47"/>
                     <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.85L73.55 76.8z" fill="#ea4335"/>
@@ -265,26 +265,26 @@
                     <path d="M59.85 53H27.5l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2L59.85 53z" fill="#2684fc"/>
                     <path d="M73.4 26.5l-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25l16.2 28h27.45c0-1.55-.4-3.1-1.2-4.5l-12.7-22z" fill="#ffba00"/>
                   </svg>
-                  <span>Open in Drive</span>
+                  <span class="flex gap-3 text-[11px] text-slate-500" >Open in Drive</span>
                 </a>
               </div>
             </div>
           </div>
 
           <!-- Error Message -->
-          <div v-if="errorMessage" class="flex items-center justify-center gap-2 bg-red-50/60 text-red-600 px-4 py-2.5 rounded-lg mt-4 font-medium border border-red-200/40 text-sm">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div v-if="errorMessage" class="flex items-center justify-center gap-1.5 bg-red-50/60 text-red-600 px-3 py-2 rounded-md mt-3 font-medium border border-red-200/40 text-[11px]">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
               <path d="M12 8V12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               <path d="M12 16H12.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
             </svg>
-            <span>{{ errorMessage }}</span>
+            <span class="flex gap-3 text-[11px]" >{{ errorMessage }}</span>
           </div>
 
           <!-- Footer -->
-          <div class="mt-5 pt-3.5 border-t border-slate-200/40 text-center">
-            <div class="flex items-center justify-center gap-1.5 mb-1">
-              <svg class="w-4 h-4" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
+          <div class="mt-3 pt-2.5 border-t border-slate-200/40 text-center">
+            <div class="flex items-center justify-center gap-1 mb-0.5">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
                 <path d="M6.6 66.85l3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8H0c0 1.55.4 3.1 1.2 4.5l5.4 9.35z" fill="#0066da"/>
                 <path d="M43.65 25L29.9 1.2c-1.35.8-2.5 1.9-3.3 3.3L1.2 52.35c-.8 1.4-1.2 2.95-1.2 4.5h27.5l16.15-31.85z" fill="#00ac47"/>
                 <path d="M73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5H59.85L73.55 76.8z" fill="#ea4335"/>
@@ -292,9 +292,9 @@
                 <path d="M59.85 53H27.5l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2L59.85 53z" fill="#2684fc"/>
                 <path d="M73.4 26.5l-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3L43.65 25l16.2 28h27.45c0-1.55-.4-3.1-1.2-4.5l-12.7-22z" fill="#ffba00"/>
               </svg>
-              <span class="text-xs text-slate-500 font-medium">Powered by Google Drive</span>
+              <span class="text-[11px] text-slate-500 font-medium">Powered by Google Drive</span>
             </div>
-            <p class="text-[10px] text-slate-400">Files are uploaded securely to your designated Google Drive folder.</p>
+            <p class="text-[9px] text-slate-400">Files are uploaded securely to your designated Google Drive folder.</p>
           </div>
           </div>
         </div>
@@ -306,23 +306,23 @@
       <div class="bg-white/95 backdrop-blur-xl rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] max-w-md w-full p-5 border border-white/60">
         <div class="flex items-center justify-between mb-3.5">
           <h3 class="text-base font-semibold text-slate-800">Select Folder</h3>
-          <button @click="closeFolderModal" class="w-7 h-7 flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100/80 transition-all">
+          <button @click="closeFolderModal" class="flex items-center justify-center transition-all rounded-lg w-7 h-7 text-slate-400 hover:text-slate-600 hover:bg-slate-100/80">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
         </div>
         <div class="mb-4">
-          <p class="text-sm text-slate-600 mb-3">Folder selection feature will be implemented here.</p>
+          <p class="mb-3 text-sm text-slate-600">Folder selection feature will be implemented here.</p>
           <div class="bg-slate-50/80 rounded-lg p-3.5 border border-slate-200/60">
             <p class="text-sm text-slate-500">Current folder: <span class="font-medium text-slate-700">{{ currentFolderPath }}</span></p>
           </div>
         </div>
-        <div class="flex gap-3 justify-end">
-          <button @click="closeFolderModal" class="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors">
+        <div class="flex justify-end gap-3">
+          <button @click="closeFolderModal" class="px-4 py-2 text-sm font-medium transition-colors text-slate-700 hover:text-slate-900">
             Cancel
           </button>
-          <button @click="confirmFolderSelection" class="px-4 py-2 text-sm font-medium bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+          <button @click="confirmFolderSelection" class="px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600">
             Confirm
           </button>
         </div>

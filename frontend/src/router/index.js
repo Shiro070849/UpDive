@@ -6,6 +6,10 @@ import ProfileView from '../views/ProfileView.vue'
 
 const routes = [
   {
+    path: '/',
+    redirect: '/login'
+  },
+  {
     path: '/login',
     name: 'login',
     component: LoginView,
@@ -16,10 +20,6 @@ const routes = [
     name: 'register',
     component: RegisterView,
     meta: { requiresAuth: false }
-  },
-  {
-    path: '/',
-    redirect: '/login'
   },
   {
     path: '/upload',
@@ -45,15 +45,10 @@ router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
   const requiresAuth = to.meta.requiresAuth
 
-  // ถ้าหน้านั้นต้องการ authentication
+  // ถ้าหน้านั้นต้องการ authentication แต่ไม่มี token
   if (requiresAuth && !token) {
-    // ถ้าไม่มี token ให้ไปหน้า login
+    // ให้ไปหน้า login
     next('/login')
-  }
-  // ถ้ามี token แล้วพยายามเข้าหน้า login/register
-  else if (!requiresAuth && token && (to.path === '/login' || to.path === '/register')) {
-    // ให้ไปหน้า home แทน
-    next('/')
   }
   else {
     // อนุญาตให้ผ่าน
