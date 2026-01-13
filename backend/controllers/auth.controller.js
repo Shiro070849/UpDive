@@ -196,6 +196,65 @@ const authController = {
       message: 'Logged out successfully'
     });
   },
+
+  /**
+   * Forgot Password / Reset Password
+   * POST /api/auth/forgot-password
+   */
+  forgotPassword: async (req, res) => {
+    try {
+      const { username, newPassword } = req.body;
+
+      // Validate input
+      if (!username || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: 'Username and new password are required'
+        });
+      }
+
+      // Validate password length
+      if (newPassword.length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: 'Password must be at least 6 characters'
+        });
+      }
+
+      // Find user in database
+      const user = await dbService.findUserByUsername(username);
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      // Hash new password
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(newPassword, salt);
+
+      // Update user password
+      await dbService.updateUser(user.id, {
+        passwordHash
+      });
+
+      console.log('[AUTH] Password reset for user:', username);
+
+      res.json({
+        success: true,
+        message: 'Password reset successfully'
+      });
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
+    }
+  },
   /**
    * Get Google OAuth URL
    * GET /api/auth/google

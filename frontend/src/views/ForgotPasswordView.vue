@@ -9,10 +9,10 @@
       </div>
 
       <!-- Title -->
-      <h1 class="text-sm font-semibold text-gray-600 mb-3 tracking-normal">Sign in to UpDive</h1>
+      <h1 class="text-sm font-semibold text-gray-600 mb-3 tracking-normal">Reset Password</h1>
 
-      <!-- Login Form -->
-      <form class="flex flex-col gap-1.5 mb-1.5" @submit.prevent="handleLogin">
+      <!-- Reset Password Form -->
+      <form class="flex flex-col gap-1.5 mb-1.5" @submit.prevent="handleResetPassword">
         <input
           class="w-full h-8 border border-gray-300 rounded-lg px-2.5 text-[11px] text-gray-800 bg-gray-50 transition-all duration-200 focus:outline-none focus:border-[#5B9BD5] focus:bg-white placeholder:text-gray-400"
           v-model="username"
@@ -23,8 +23,8 @@
         <div class="relative">
           <input
             class="w-full h-8 border border-gray-300 rounded-lg px-2.5 pr-8 text-[11px] text-gray-800 bg-gray-50 transition-all duration-200 focus:outline-none focus:border-[#5B9BD5] focus:bg-white placeholder:text-gray-400"
-            v-model="password"
-            placeholder="Password"
+            v-model="newPassword"
+            placeholder="New Password"
             :type="showPassword ? 'text' : 'password'"
             required
           >
@@ -43,9 +43,36 @@
             </svg>
           </button>
         </div>
+        <div class="relative">
+          <input
+            class="w-full h-8 border border-gray-300 rounded-lg px-2.5 pr-8 text-[11px] text-gray-800 bg-gray-50 transition-all duration-200 focus:outline-none focus:border-[#5B9BD5] focus:bg-white placeholder:text-gray-400"
+            v-model="confirmPassword"
+            placeholder="Confirm New Password"
+            :type="showConfirmPassword ? 'text' : 'password'"
+            required
+          >
+          <button
+            type="button"
+            @click="showConfirmPassword = !showConfirmPassword"
+            class="absolute right-1.5 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            <svg v-if="!showConfirmPassword" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <svg v-else class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
 
         <div v-if="errorMessage" class="text-red-500 text-[11px] font-medium py-1 px-2 bg-red-50 rounded-lg border border-red-500">
           {{ errorMessage }}
+        </div>
+
+        <div v-if="successMessage" class="text-green-500 text-[11px] font-medium py-1 px-2 bg-green-50 rounded-lg border border-green-500">
+          {{ successMessage }}
         </div>
 
         <button
@@ -53,17 +80,14 @@
           type="submit"
           :disabled="isLoading"
         >
-          {{ isLoading ? 'Loading...' : 'Log In' }}
+          {{ isLoading ? 'Resetting...' : 'Reset Password' }}
         </button>
       </form>
 
-      <!-- Forgot Password Link -->
-      <router-link to="/forgot-password" class="inline-block mt-1.5 text-[#5B9BD5] text-[10px] no-underline opacity-75 transition-all duration-200 hover:text-[#4A8BC2] hover:opacity-100 hover:underline">Forgot Password?</router-link>
-
-      <!-- Register Link -->
+      <!-- Back to Login Link -->
       <div class="mt-1.5 text-[11px] text-gray-500">
-        Don't have an account?
-        <router-link to="/register" class="text-[#5B9BD5] text-[11px] font-medium hover:text-[#4A8BC2] hover:underline transition-all duration-200 ml-0.5">Sign up</router-link>
+        Remember your password?
+        <router-link to="/login" class="text-[#5B9BD5] text-[11px] font-medium hover:text-[#4A8BC2] hover:underline transition-all duration-200 ml-0.5">Sign in</router-link>
       </div>
     </div>
   </div>
@@ -75,37 +99,55 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 export default {
-  name: 'LoginView',
+  name: 'ForgotPasswordView',
   setup() {
     const router = useRouter();
     const username = ref('');
-    const password = ref('');
+    const newPassword = ref('');
+    const confirmPassword = ref('');
     const errorMessage = ref('');
+    const successMessage = ref('');
     const isLoading = ref(false);
     const showPassword = ref(false);
+    const showConfirmPassword = ref(false);
 
-    const handleLogin = async () => {
+    const handleResetPassword = async () => {
       try {
-        isLoading.value = true;
+        // Reset messages
         errorMessage.value = '';
+        successMessage.value = '';
 
-        const response = await axios.post(process.env.VUE_APP_API_URL + '/api/auth/login', {
+        // Validate password length
+        if (newPassword.value.length < 6) {
+          errorMessage.value = 'Password must be at least 6 characters';
+          return;
+        }
+
+        // Validate password match
+        if (newPassword.value !== confirmPassword.value) {
+          errorMessage.value = 'Passwords do not match';
+          return;
+        }
+
+        isLoading.value = true;
+
+        const response = await axios.post(process.env.VUE_APP_API_URL + '/api/auth/forgot-password', {
           username: username.value,
-          password: password.value
+          newPassword: newPassword.value
         });
 
         if (response.data.success) {
-          // Save token and user info to localStorage
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-
-          // Redirect to upload page
-          router.push('/upload');
+          successMessage.value = 'Password reset successfully! Redirecting to login...';
+          
+          // Redirect to login after 2 seconds
+          setTimeout(() => {
+            router.push('/login');
+          }, 2000);
         }
       } catch (error) {
-        console.error('Login error:', error);
+        console.error('Reset password error:', error);
         if (error.response) {
-          errorMessage.value = error.response.data.message || 'Login failed';
+          errorMessage.value = error.response.data.message || 'Failed to reset password';
         } else {
           errorMessage.value = 'Cannot connect to server';
         }
@@ -116,11 +158,14 @@ export default {
 
     return {
       username,
-      password,
+      newPassword,
+      confirmPassword,
       errorMessage,
+      successMessage,
       isLoading,
       showPassword,
-      handleLogin
+      showConfirmPassword,
+      handleResetPassword
     };
   }
 };
@@ -131,3 +176,4 @@ export default {
   background-image: url('@/assets/images/Dive_Bg.png');
 }
 </style>
+

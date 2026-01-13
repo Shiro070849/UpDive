@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-screen bg-center bg-no-repeat bg-cover" style="background-image: url('@/assets/images/Dive_Bg.png');">
+  <div class="relative min-h-screen upload-wrapper">
     <!-- Navbar -->
     <Navbar
       :user-name="user?.fullName || user?.username"
@@ -9,7 +9,7 @@
       @settings="handleSettings"
     />
 
-    <!-- Upload History Content -->
+    <!-- Upload History Content  -->
     <div class="px-3 pt-16 pb-8 md:pt-20 md:px-6">
       <div class="max-w-2xl mx-auto">
         <div class="relative bg-white/85 backdrop-blur-xl rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.6)] border border-white/60 overflow-hidden">
