@@ -4,7 +4,8 @@
  */
 
 const googleDriveService = require('../services/googleDrive.service');
-const { validateCredentials } = require('../data/users');
+const dbService = require('../services/db.service');
+const bcrypt = require('bcryptjs');
 const { generateToken, verifyToken } = require('../utils/jwt');
 
 const authController = {
@@ -12,7 +13,7 @@ const authController = {
    * User Login
    * POST /api/auth/login
    */
-  login: (req, res) => {
+  login: async (req, res) => {
     try {
       const { username, password } = req.body;
 
@@ -24,10 +25,20 @@ const authController = {
         });
       }
 
-      // Validate credentials
-      const user = validateCredentials(username, password);
+      // Find user in database
+      const user = await dbService.findUserByUsername(username);
 
       if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid username or password'
+        });
+      }
+
+      // Verify password
+      const isValidPassword = await bcrypt.compare(password, user.password_hash);
+
+      if (!isValidPassword) {
         return res.status(401).json({
           success: false,
           message: 'Invalid username or password'
@@ -48,7 +59,7 @@ const authController = {
         user: {
           id: user.id,
           username: user.username,
-          fullName: user.fullName,
+          fullName: user.full_name,
           role: user.role,
           email: user.email
         }
@@ -110,15 +121,15 @@ const authController = {
    * User Registration
    * POST /api/auth/register
    */
-  register: (req, res) => {
+  register: async (req, res) => {
     try {
       const { fullName, email, username, password } = req.body;
 
       // Validate input
-      if (!fullName || !email || !username || !password) {
+      if (!fullName || !username || !password) {
         return res.status(400).json({
           success: false,
-          message: 'All fields are required'
+          message: 'Full name, username and password are required'
         });
       }
 
@@ -130,9 +141,8 @@ const authController = {
         });
       }
 
-      // Check if username already exists (using users from data/users.js)
-      const { findUserByUsername } = require('../data/users');
-      const existingUser = findUserByUsername(username);
+      // Check if username already exists
+      const existingUser = await dbService.findUserByUsername(username);
 
       if (existingUser) {
         return res.status(409).json({
@@ -141,17 +151,29 @@ const authController = {
         });
       }
 
-      // In a real app, we would save to database here
-      // For now, just return success (data will be lost on server restart)
-      console.log('New user registered:', { fullName, email, username });
+      // Hash password
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash(password, salt);
+
+      // Create user in database
+      const newUser = await dbService.createUser({
+        username,
+        passwordHash,
+        email: email || null,
+        fullName,
+        role: 'user'
+      });
+
+      console.log('[AUTH] New user registered:', username);
 
       res.status(201).json({
         success: true,
         message: 'Account created successfully',
         user: {
-          username,
-          fullName,
-          email
+          id: newUser.id,
+          username: newUser.username,
+          fullName: newUser.full_name,
+          email: newUser.email
         }
       });
     } catch (error) {

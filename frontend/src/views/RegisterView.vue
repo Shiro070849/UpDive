@@ -140,7 +140,7 @@ export default {
           return;
         }
 
-        const response = await axios.post('http://localhost:8088/api/auth/register', {
+        const response = await axios.post(process.env.VUE_APP_API_URL + '/api/auth/register', {
           fullName: fullName.value,
           username: username.value,
           password: password.value

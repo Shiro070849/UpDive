@@ -89,7 +89,7 @@ export default {
         isLoading.value = true;
         errorMessage.value = '';
 
-        const response = await axios.post('http://localhost:8088/api/auth/login', {
+        const response = await axios.post(process.env.VUE_APP_API_URL + '/api/auth/login', {
           username: username.value,
           password: password.value
         });

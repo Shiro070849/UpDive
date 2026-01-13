@@ -17,4 +17,7 @@ module.exports = (app) => {
 
   // Delete file
   app.delete('/api/files/:fileId', uploadController.deleteFile);
+
+  // Get upload history for current user
+  app.get('/api/upload/history', uploadController.getUploadHistory);
 };

@@ -1,6 +1,6 @@
 <template>
-  <nav class="fixed top-4 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-2rem)] max-w-[1200px]">
-    <div class="bg-white/85 backdrop-blur-xl rounded-xl px-4 py-2 flex items-center justify-between shadow-[0_3px_16px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.6)] border border-white/50">
+  <nav class="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 z-[100] w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-[1200px]">
+    <div class="bg-white/85 backdrop-blur-xl rounded-xl px-3 sm:px-4 py-2 flex items-center justify-between shadow-[0_3px_16px_rgba(0,0,0,0.05),0_1px_2px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.6)] border border-white/50">
       <!-- Logo -->
       <div class="flex items-center gap-2.5">
         <div class="flex items-center justify-center w-9 h-9">
@@ -17,7 +17,7 @@
             </defs>
           </svg>
         </div>
-        <span class="text-lg font-bold tracking-tight text-slate-800">UpDive</span>
+        <span class="text-base sm:text-lg font-bold tracking-tight text-slate-800">UpDive</span>
       </div>
 
       <!-- User Section -->
@@ -208,20 +208,3 @@ export default {
 };
 </script>
 
-<style scoped>
-/* Responsive styles for mobile */
-@media (max-width: 640px) {
-  nav {
-    top: 0.5rem;
-    width: calc(100% - 1rem);
-  }
-
-  nav > div {
-    padding: 0.5rem 0.75rem;
-  }
-
-  .text-lg {
-    font-size: 1rem;
-  }
-}
-</style>

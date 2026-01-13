@@ -4,6 +4,8 @@
  */
 
 const googleDriveService = require('../services/googleDrive.service');
+const dbService = require('../services/db.service');
+const { verifyToken } = require('../utils/jwt');
 
 /**
  * Fix Thai filename encoding issue
@@ -50,6 +52,35 @@ const uploadController = {
         file.mimetype
       );
 
+      // Get user id from token
+      let userId = null;
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const payload = verifyToken(token);
+        if (payload) {
+          userId = payload.userId;
+        }
+      }
+
+      // Save upload log to database
+      if (userId) {
+        try {
+          await dbService.createUploadLog({
+            userId,
+            fileName: driveFile.name,
+            originalName: file.originalname,
+            fileSize: file.size,
+            mimeType: file.mimetype,
+            driveFileId: driveFile.id,
+            driveUrl: driveFile.webViewLink,
+            status: 'success'
+          });
+        } catch (logError) {
+          console.error('[UPLOAD] Error saving log:', logError.message);
+        }
+      }
+
       // Return success response
       res.json({
         success: true,
@@ -71,7 +102,13 @@ const uploadController = {
       let errorMessage = 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์';
       let statusCode = 500;
       
-      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+      // Handle refresh token expiration
+      if (error.code === 'INVALID_REFRESH_TOKEN') {
+        errorMessage = 'Google Refresh Token หมดอายุหรือถูกยกเลิก กรุณาไปที่ /api/auth/google เพื่อขอ Refresh Token ใหม่';
+        statusCode = 401; // Unauthorized
+      }
+      // Handle network errors
+      else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
         errorMessage = 'ไม่สามารถเชื่อมต่อกับ Google Drive ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต DNS หรือ Firewall';
         statusCode = 503; // Service Unavailable
       }
@@ -133,7 +170,13 @@ const uploadController = {
       let errorMessage = 'เกิดข้อผิดพลาดในการอัปโหลดไฟล์';
       let statusCode = 500;
       
-      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+      // Handle refresh token expiration
+      if (error.code === 'INVALID_REFRESH_TOKEN') {
+        errorMessage = 'Google Refresh Token หมดอายุหรือถูกยกเลิก กรุณาไปที่ /api/auth/google เพื่อขอ Refresh Token ใหม่';
+        statusCode = 401; // Unauthorized
+      }
+      // Handle network errors
+      else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
         errorMessage = 'ไม่สามารถเชื่อมต่อกับ Google Drive ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต DNS หรือ Firewall';
         statusCode = 503; // Service Unavailable
       }
@@ -167,7 +210,13 @@ const uploadController = {
       let errorMessage = 'เกิดข้อผิดพลาดในการดึงรายการไฟล์';
       let statusCode = 500;
       
-      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+      // Handle refresh token expiration
+      if (error.code === 'INVALID_REFRESH_TOKEN') {
+        errorMessage = 'Google Refresh Token หมดอายุหรือถูกยกเลิก กรุณาไปที่ /api/auth/google เพื่อขอ Refresh Token ใหม่';
+        statusCode = 401; // Unauthorized
+      }
+      // Handle network errors
+      else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
         errorMessage = 'ไม่สามารถเชื่อมต่อกับ Google Drive ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต DNS หรือ Firewall';
         statusCode = 503; // Service Unavailable
       }
@@ -205,21 +254,68 @@ const uploadController = {
 
     } catch (error) {
       console.error('Delete file error:', error);
-      
+
       // Provide more specific error messages
       let errorMessage = 'เกิดข้อผิดพลาดในการลบไฟล์';
       let statusCode = 500;
-      
-      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
+
+      // Handle refresh token expiration
+      if (error.code === 'INVALID_REFRESH_TOKEN') {
+        errorMessage = 'Google Refresh Token หมดอายุหรือถูกยกเลิก กรุณาไปที่ /api/auth/google เพื่อขอ Refresh Token ใหม่';
+        statusCode = 401; // Unauthorized
+      }
+      // Handle network errors
+      else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
         errorMessage = 'ไม่สามารถเชื่อมต่อกับ Google Drive ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต DNS หรือ Firewall';
         statusCode = 503; // Service Unavailable
       }
-      
+
       res.status(statusCode).json({
         success: false,
         message: errorMessage,
         error: error.message,
         code: error.code
+      });
+    }
+  },
+
+  /**
+   * Get upload history for current user
+   * GET /api/upload/history
+   */
+  getUploadHistory: async (req, res) => {
+    try {
+      // Get user id from token
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({
+          success: false,
+          message: 'กรุณาเข้าสู่ระบบ'
+        });
+      }
+
+      const token = authHeader.substring(7);
+      const payload = verifyToken(token);
+      if (!payload || !payload.userId) {
+        return res.status(401).json({
+          success: false,
+          message: 'Token ไม่ถูกต้องหรือหมดอายุ'
+        });
+      }
+
+      const logs = await dbService.getUploadLogsByUserId(payload.userId);
+
+      res.json({
+        success: true,
+        logs: logs
+      });
+
+    } catch (error) {
+      console.error('Get upload history error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'เกิดข้อผิดพลาดในการดึงประวัติอัพโหลด',
+        error: error.message
       });
     }
   }

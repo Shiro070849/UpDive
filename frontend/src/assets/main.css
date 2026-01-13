@@ -1,3 +1,40 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global styles */
+@layer base {
+  html {
+    font-size: 14px;
+  }
+
+  html, body {
+    @apply w-full h-full overflow-x-hidden;
+  }
+
+  body {
+    @apply bg-gray-100 text-gray-900 font-sans antialiased;
+  }
+
+  #app {
+    @apply w-full min-h-screen;
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-200 rounded;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}

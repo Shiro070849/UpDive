@@ -45,11 +45,57 @@ class GoogleDriveService {
 
   /**
    * Set credentials using refresh token from .env
+   * Google OAuth2 client will automatically refresh access token when it expires
    */
   setCredentials() {
+    if (!googleConfig.drive.refreshToken) {
+      throw new Error('GOOGLE_REFRESH_TOKEN is not configured in .env file');
+    }
+
     this.oauth2Client.setCredentials({
       refresh_token: googleConfig.drive.refreshToken
     });
+
+    // Listen for token refresh events (for logging)
+    this.oauth2Client.on('tokens', (tokens) => {
+      if (tokens.refresh_token) {
+        // New refresh token received (rare, but can happen)
+        console.log('⚠️ New refresh token received - consider updating .env file');
+      }
+      if (tokens.access_token) {
+        console.log('✅ Access token refreshed successfully');
+      }
+    });
+  }
+
+  /**
+   * Check if refresh token is valid by attempting to get a new access token
+   * Returns true if valid, false if expired/invalid
+   */
+  async validateRefreshToken() {
+    try {
+      this.setCredentials();
+      
+      // Try to refresh access token
+      const { credentials } = await this.oauth2Client.refreshAccessToken();
+      
+      if (credentials.access_token) {
+        console.log('✅ Refresh token is valid');
+        return true;
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('❌ Refresh token validation failed:', error.message);
+      
+      // Check for specific error codes
+      if (error.message && error.message.includes('invalid_grant')) {
+        console.error('⚠️ Refresh token has expired or been revoked');
+        console.error('💡 Solution: Get a new refresh token from /api/auth/google');
+      }
+      
+      return false;
+    }
   }
 
   /**
@@ -88,6 +134,17 @@ class GoogleDriveService {
     } catch (error) {
       console.error('Error uploading file to Drive:', error);
       
+      // Handle refresh token expiration
+      if (error.message && (error.message.includes('invalid_grant') || error.message.includes('Token has been expired'))) {
+        const tokenError = new Error(
+          'Google refresh token has expired or been revoked. ' +
+          'Please visit /api/auth/google to get a new refresh token and update your .env file.'
+        );
+        tokenError.code = 'INVALID_REFRESH_TOKEN';
+        tokenError.originalError = error;
+        throw tokenError;
+      }
+      
       // Provide more helpful error messages for common network issues
       if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
         const networkError = new Error(
@@ -123,6 +180,17 @@ class GoogleDriveService {
     } catch (error) {
       console.error('Error listing files:', error);
       
+      // Handle refresh token expiration
+      if (error.message && (error.message.includes('invalid_grant') || error.message.includes('Token has been expired'))) {
+        const tokenError = new Error(
+          'Google refresh token has expired or been revoked. ' +
+          'Please visit /api/auth/google to get a new refresh token and update your .env file.'
+        );
+        tokenError.code = 'INVALID_REFRESH_TOKEN';
+        tokenError.originalError = error;
+        throw tokenError;
+      }
+      
       // Provide more helpful error messages for common network issues
       if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
         const networkError = new Error(
@@ -155,6 +223,17 @@ class GoogleDriveService {
       return true;
     } catch (error) {
       console.error('Error deleting file:', error);
+      
+      // Handle refresh token expiration
+      if (error.message && (error.message.includes('invalid_grant') || error.message.includes('Token has been expired'))) {
+        const tokenError = new Error(
+          'Google refresh token has expired or been revoked. ' +
+          'Please visit /api/auth/google to get a new refresh token and update your .env file.'
+        );
+        tokenError.code = 'INVALID_REFRESH_TOKEN';
+        tokenError.originalError = error;
+        throw tokenError;
+      }
       
       // Provide more helpful error messages for common network issues
       if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.code === 'ETIMEDOUT') {
