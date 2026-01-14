@@ -39,18 +39,5 @@ apiClient.interceptors.response.use(
   }
 )
 
-// Example API methods
-export default {
-  // Example: GET request
-  getHello() {
-    return apiClient.get('/api/example/hello')
-  },
-
-  // Add your API methods here
-  // get(endpoint) {
-  //   return apiClient.get(endpoint)
-  // },
-  // post(endpoint, data) {
-  //   return apiClient.post(endpoint, data)
-  // }
-}
+// Export configured client
+export default apiClient
