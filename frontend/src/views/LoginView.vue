@@ -74,41 +74,86 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
+/**
+ * LoginView Component
+ * Handles user authentication and login flow
+ */
+
+// Constants
+const ROUTES = {
+  UPLOAD: '/upload'
+};
+
+const API_ENDPOINTS = {
+  LOGIN: '/api/auth/login'
+};
+
+const ERROR_MESSAGES = {
+  LOGIN_FAILED: 'Login failed',
+  CONNECTION_ERROR: 'Cannot connect to server'
+};
+
+const STORAGE_KEYS = {
+  TOKEN: 'token',
+  USER: 'user'
+};
+
 export default {
   name: 'LoginView',
   setup() {
     const router = useRouter();
+    
+    // Reactive state
     const username = ref('');
     const password = ref('');
     const errorMessage = ref('');
     const isLoading = ref(false);
     const showPassword = ref(false);
 
+    /**
+     * Handles API error and returns user-friendly error message
+     * @param {Error} error - The error object from axios
+     * @returns {string} User-friendly error message
+     */
+    const handleApiError = (error) => {
+      if (error.response) {
+        return error.response.data.message || ERROR_MESSAGES.LOGIN_FAILED;
+      }
+      return ERROR_MESSAGES.CONNECTION_ERROR;
+    };
+
+    /**
+     * Saves authentication data to localStorage
+     * @param {string} token - JWT token
+     * @param {Object} user - User object
+     */
+    const saveAuthData = (token, user) => {
+      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+    };
+
+    /**
+     * Handles login form submission
+     * Authenticates user and redirects to upload page on success
+     */
     const handleLogin = async () => {
       try {
         isLoading.value = true;
         errorMessage.value = '';
 
-        const response = await axios.post(process.env.VUE_APP_API_URL + '/api/auth/login', {
+        const apiUrl = process.env.VUE_APP_API_URL + API_ENDPOINTS.LOGIN;
+        const response = await axios.post(apiUrl, {
           username: username.value,
           password: password.value
         });
 
         if (response.data.success) {
-          // Save token and user info to localStorage
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-
-          // Redirect to upload page
-          router.push('/upload');
+          saveAuthData(response.data.token, response.data.user);
+          router.push(ROUTES.UPLOAD);
         }
       } catch (error) {
         console.error('Login error:', error);
-        if (error.response) {
-          errorMessage.value = error.response.data.message || 'Login failed';
-        } else {
-          errorMessage.value = 'Cannot connect to server';
-        }
+        errorMessage.value = handleApiError(error);
       } finally {
         isLoading.value = false;
       }

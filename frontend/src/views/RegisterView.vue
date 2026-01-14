@@ -106,10 +106,43 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
+/**
+ * RegisterView Component
+ * Handles user registration and account creation
+ */
+
+// Constants
+const ROUTES = {
+  LOGIN: '/login'
+};
+
+const API_ENDPOINTS = {
+  REGISTER: '/api/auth/register'
+};
+
+const VALIDATION = {
+  MIN_PASSWORD_LENGTH: 6
+};
+
+const ERROR_MESSAGES = {
+  PASSWORDS_NOT_MATCH: 'Passwords do not match',
+  PASSWORD_TOO_SHORT: 'Password must be at least 6 characters',
+  REGISTRATION_FAILED: 'Registration failed',
+  CONNECTION_ERROR: 'Cannot connect to server'
+};
+
+const SUCCESS_MESSAGES = {
+  ACCOUNT_CREATED: 'Account created successfully! Redirecting to login...'
+};
+
+const REDIRECT_DELAY_MS = 2000; // 2 seconds
+
 export default {
   name: 'RegisterView',
   setup() {
     const router = useRouter();
+    
+    // Reactive state
     const fullName = ref('');
     const username = ref('');
     const password = ref('');
@@ -120,47 +153,83 @@ export default {
     const showPassword = ref(false);
     const showConfirmPassword = ref(false);
 
+    /**
+     * Validates password requirements
+     * @param {string} password - Password to validate
+     * @param {string} confirmPassword - Confirmation password
+     * @returns {Object} Validation result with isValid flag and error message
+     */
+    const validatePassword = (password, confirmPassword) => {
+      if (password !== confirmPassword) {
+        return {
+          isValid: false,
+          error: ERROR_MESSAGES.PASSWORDS_NOT_MATCH
+        };
+      }
+      
+      if (password.length < VALIDATION.MIN_PASSWORD_LENGTH) {
+        return {
+          isValid: false,
+          error: ERROR_MESSAGES.PASSWORD_TOO_SHORT
+        };
+      }
+      
+      return { isValid: true, error: '' };
+    };
+
+    /**
+     * Handles API error and returns user-friendly error message
+     * @param {Error} error - The error object from axios
+     * @returns {string} User-friendly error message
+     */
+    const handleApiError = (error) => {
+      if (error.response) {
+        return error.response.data.message || ERROR_MESSAGES.REGISTRATION_FAILED;
+      }
+      return ERROR_MESSAGES.CONNECTION_ERROR;
+    };
+
+    /**
+     * Resets all form messages
+     */
+    const resetMessages = () => {
+      errorMessage.value = '';
+      successMessage.value = '';
+    };
+
+    /**
+     * Handles registration form submission
+     * Validates input, creates account, and redirects to login on success
+     */
     const handleRegister = async () => {
       try {
         isLoading.value = true;
-        errorMessage.value = '';
-        successMessage.value = '';
+        resetMessages();
 
-        // Validate passwords match
-        if (password.value !== confirmPassword.value) {
-          errorMessage.value = 'Passwords do not match';
+        // Validate password
+        const validation = validatePassword(password.value, confirmPassword.value);
+        if (!validation.isValid) {
+          errorMessage.value = validation.error;
           isLoading.value = false;
           return;
         }
 
-        // Validate password length
-        if (password.value.length < 6) {
-          errorMessage.value = 'Password must be at least 6 characters';
-          isLoading.value = false;
-          return;
-        }
-
-        const response = await axios.post(process.env.VUE_APP_API_URL + '/api/auth/register', {
+        const apiUrl = process.env.VUE_APP_API_URL + API_ENDPOINTS.REGISTER;
+        const response = await axios.post(apiUrl, {
           fullName: fullName.value,
           username: username.value,
           password: password.value
         });
 
         if (response.data.success) {
-          successMessage.value = 'Account created successfully! Redirecting to login...';
-
-          // Redirect to login after 2 seconds
+          successMessage.value = SUCCESS_MESSAGES.ACCOUNT_CREATED;
           setTimeout(() => {
-            router.push('/login');
-          }, 2000);
+            router.push(ROUTES.LOGIN);
+          }, REDIRECT_DELAY_MS);
         }
       } catch (error) {
         console.error('Registration error:', error);
-        if (error.response) {
-          errorMessage.value = error.response.data.message || 'Registration failed';
-        } else {
-          errorMessage.value = 'Cannot connect to server';
-        }
+        errorMessage.value = handleApiError(error);
       } finally {
         isLoading.value = false;
       }

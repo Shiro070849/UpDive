@@ -108,9 +108,6 @@
         </div>
       </div>
     </div>
-
-    <!-- AI Chatbot -->
-    <ChatBot />
   </div>
 </template>
 
@@ -119,21 +116,54 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Navbar from '../components/Navbar.vue';
-import ChatBot from '../components/ChatBot.vue';
 import uploadService from '../services/upload.service';
+
+/**
+ * ProfileView Component
+ * Displays user profile and upload history
+ */
+
+// Constants
+const ROUTES = {
+  LOGIN: '/login',
+  PROFILE: '/profile',
+  UPLOAD: '/upload'
+};
+
+const STORAGE_KEYS = {
+  TOKEN: 'token',
+  USER: 'user'
+};
+
+const DATE_LOCALE = 'th-TH';
+const DATE_OPTIONS = {
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit'
+};
+
+const FILE_SIZE_BASE = 1024;
+const FILE_SIZE_UNITS = ['B', 'KB', 'MB', 'GB'];
+const DEFAULT_FILE_SIZE = '0 B';
 
 export default {
   name: 'ProfileView',
   components: {
-    Navbar,
-    ChatBot
+    Navbar
   },
   setup() {
     const router = useRouter();
+    
+    // Reactive state
     const user = ref(null);
     const uploadHistory = ref([]);
     const loadingHistory = ref(false);
 
+    /**
+     * Loads upload history from API
+     */
     const loadUploadHistory = async () => {
       loadingHistory.value = true;
       try {
@@ -148,50 +178,68 @@ export default {
       }
     };
 
+    /**
+     * Formats file size in bytes to human-readable format
+     * @param {number} bytes - File size in bytes
+     * @returns {string} Formatted file size (e.g., "1.5 MB")
+     */
     const formatFileSize = (bytes) => {
-      if (!bytes) return '0 B';
-      const k = 1024;
-      const sizes = ['B', 'KB', 'MB', 'GB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+      if (!bytes) return DEFAULT_FILE_SIZE;
+      const i = Math.floor(Math.log(bytes) / Math.log(FILE_SIZE_BASE));
+      return parseFloat((bytes / Math.pow(FILE_SIZE_BASE, i)).toFixed(2)) + ' ' + FILE_SIZE_UNITS[i];
     };
 
+    /**
+     * Formats date string to localized format
+     * @param {string} dateStr - ISO date string
+     * @returns {string} Formatted date string
+     */
     const formatDate = (dateStr) => {
       if (!dateStr) return '';
       const date = new Date(dateStr);
-      return date.toLocaleDateString('th-TH', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      return date.toLocaleDateString(DATE_LOCALE, DATE_OPTIONS);
     };
 
+    /**
+     * Loads user data from localStorage on component mount
+     */
     onMounted(() => {
-      const userStr = localStorage.getItem('user');
+      const userStr = localStorage.getItem(STORAGE_KEYS.USER);
       if (userStr) {
         user.value = JSON.parse(userStr);
       }
       loadUploadHistory();
     });
 
+    /**
+     * Clears authentication data and redirects to login
+     */
     const handleLogout = () => {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      router.push('/login');
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER);
+      router.push(ROUTES.LOGIN);
     };
 
+    /**
+     * Navigates to profile page (no-op if already on profile)
+     */
     const handleProfile = () => {
-      router.push('/profile');
+      router.push(ROUTES.PROFILE);
     };
 
+    /**
+     * Handles settings button click
+     * TODO: Implement settings functionality
+     */
     const handleSettings = () => {
       console.log('Settings clicked');
     };
 
+    /**
+     * Navigates to upload page
+     */
     const goToUpload = () => {
-      router.push('/upload');
+      router.push(ROUTES.UPLOAD);
     };
 
     return {

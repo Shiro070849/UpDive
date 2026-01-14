@@ -328,9 +328,6 @@
         </div>
       </div>
     </div>
-
-    <!-- AI Chatbot -->
-    <ChatBot />
   </div>
 </template>
 
@@ -339,50 +336,140 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import uploadService from '../services/upload.service';
 import Navbar from '../components/Navbar.vue';
-import ChatBot from '../components/ChatBot.vue';
+
+/**
+ * UploadView Component
+ * Handles file upload to Google Drive with drag & drop support
+ */
+
+// Constants
+const ROUTES = {
+  LOGIN: '/login',
+  PROFILE: '/profile',
+  UPLOAD: '/upload'
+};
+
+const STORAGE_KEYS = {
+  TOKEN: 'token',
+  USER: 'user'
+};
+
+const FILE_LIMITS = {
+  MAX_SIZE_MB: 50,
+  MAX_SIZE_BYTES: 50 * 1024 * 1024 // 50MB in bytes
+};
+
+const FILE_EXTENSIONS = {
+  PDF: ['pdf'],
+  IMAGE: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
+  VIDEO: ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm']
+};
+
+const FILE_ICON_CLASSES = {
+  PDF: 'bg-red-50 text-red-600',
+  IMAGE: 'bg-green-50 text-green-600',
+  VIDEO: 'bg-blue-50 text-blue-600',
+  DEFAULT: 'bg-slate-50 text-slate-600'
+};
+
+const UPLOAD_STATUS = {
+  UPLOADING: 'uploading',
+  COMPLETED: 'completed',
+  ERROR: 'error'
+};
+
+const CLEAR_FILES_DELAY_MS = 1000; // 1 second
+
+const DEFAULT_FOLDER_PATH = 'My Drive / UpDive / Uploads';
+
+const DEFAULT_USER = {
+  NAME: 'User',
+  EMAIL: 'user@example.com'
+};
 
 export default {
   name: 'UploadView',
   components: {
-    Navbar,
-    ChatBot
+    Navbar
   },
   setup() {
     const router = useRouter();
+    
+    // Reactive state
     const fileInput = ref(null);
     const selectedFiles = ref([]);
     const uploadedFiles = ref([]);
-    const uploadingFiles = ref([]); // ไฟล์ที่กำลังอัปโหลดพร้อม progress
+    const uploadingFiles = ref([]); // Files currently being uploaded with progress
     const isDragging = ref(false);
     const isUploading = ref(false);
     const uploadProgress = ref(0);
     const errorMessage = ref('');
     const showFolderModal = ref(false);
-    const currentFolderPath = ref('My Drive / UpDive / Uploads');
+    const currentFolderPath = ref(DEFAULT_FOLDER_PATH);
 
     // User info (will be replaced with actual auth data later)
-    const userName = ref('User');
-    const userEmail = ref('user@example.com');
+    const userName = ref(DEFAULT_USER.NAME);
+    const userEmail = ref(DEFAULT_USER.EMAIL);
 
+    /**
+     * Gets file extension from filename
+     * @param {string} fileName - Full filename
+     * @returns {string} File extension in lowercase
+     */
+    const getFileExtension = (fileName) => {
+      return fileName.split('.').pop()?.toLowerCase() || '';
+    };
+
+    /**
+     * Validates file size against maximum limit
+     * @param {File} file - File to validate
+     * @returns {Object} Validation result with isValid flag and error message
+     */
+    const validateFileSize = (file) => {
+      if (file.size > FILE_LIMITS.MAX_SIZE_BYTES) {
+        return {
+          isValid: false,
+          error: `ไฟล์ ${file.name} มีขนาดใหญ่เกิน ${FILE_LIMITS.MAX_SIZE_MB}MB`
+        };
+      }
+      return { isValid: true, error: '' };
+    };
+
+    /**
+     * Triggers file input click to open file picker
+     */
     const triggerFileInput = () => {
       fileInput.value.click();
     };
 
+    /**
+     * Handles file selection from file input
+     * @param {Event} event - File input change event
+     */
     const handleFileSelect = (event) => {
       const files = Array.from(event.target.files);
       addFiles(files);
     };
 
+    /**
+     * Handles file drop from drag & drop
+     * @param {DragEvent} event - Drag and drop event
+     */
     const handleDrop = (event) => {
       isDragging.value = false;
       const files = Array.from(event.dataTransfer.files);
       addFiles(files);
     };
 
+    /**
+     * Adds files to selected files list after validation
+     * @param {File[]} files - Array of files to add
+     */
     const addFiles = (files) => {
       const validFiles = files.filter(file => {
-        if (file.size > 50 * 1024 * 1024) {
-          errorMessage.value = `ไฟล์ ${file.name} มีขนาดใหญ่เกิน 50MB`;
+        const validation = validateFileSize(file);
+        if (!validation.isValid) {
+          errorMessage.value = validation.error;
           return false;
         }
         return true;
@@ -391,62 +478,101 @@ export default {
       errorMessage.value = '';
     };
 
+    /**
+     * Removes file from selected files list
+     * @param {number} index - Index of file to remove
+     */
     const removeFile = (index) => {
       selectedFiles.value.splice(index, 1);
     };
 
+    /**
+     * Creates upload item object for tracking upload progress
+     * @param {File} file - File to upload
+     * @param {number} index - File index
+     * @returns {Object} Upload item object
+     */
+    const createUploadItem = (file, index) => ({
+      id: `upload-${Date.now()}-${index}`,
+      name: file.name,
+      size: file.size,
+      file: file,
+      progress: 0,
+      uploaded: 0,
+      status: UPLOAD_STATUS.UPLOADING
+    });
+
+    /**
+     * Updates upload progress for a file
+     * @param {Object} uploadItem - Upload item to update
+     * @param {number} progress - Progress percentage (0-100)
+     */
+    const updateUploadProgress = (uploadItem, progress) => {
+      uploadItem.progress = progress;
+      uploadItem.uploaded = Math.round((uploadItem.size * progress) / 100);
+    };
+
+    /**
+     * Cleans up completed/error files from uploading list
+     */
+    const cleanupCompletedFiles = () => {
+      setTimeout(() => {
+        uploadingFiles.value = uploadingFiles.value.filter(f => f.status === UPLOAD_STATUS.UPLOADING);
+        if (uploadingFiles.value.length === 0) {
+          isUploading.value = false;
+        }
+      }, CLEAR_FILES_DELAY_MS);
+    };
+
+    /**
+     * Resets form after upload completion
+     */
+    const resetUploadForm = () => {
+      selectedFiles.value = [];
+      fileInput.value.value = '';
+    };
+
+    /**
+     * Handles file upload to Google Drive
+     * Uploads files one by one to track individual progress
+     */
     const uploadFiles = async () => {
       if (selectedFiles.value.length === 0) return;
 
       isUploading.value = true;
       errorMessage.value = '';
 
-      // สร้าง uploadingFiles array พร้อม progress
-      uploadingFiles.value = selectedFiles.value.map((file, index) => ({
-        id: `upload-${Date.now()}-${index}`,
-        name: file.name,
-        size: file.size,
-        file: file,
-        progress: 0,
-        uploaded: 0,
-        status: 'uploading' // uploading, completed, error
-      }));
+      // Create uploadingFiles array with progress tracking
+      uploadingFiles.value = selectedFiles.value.map((file, index) => 
+        createUploadItem(file, index)
+      );
 
       try {
-        // อัปโหลดทีละไฟล์เพื่อให้มี progress รายไฟล์
+        // Upload files one by one to track progress per file
         const results = [];
         for (let i = 0; i < uploadingFiles.value.length; i++) {
           const uploadItem = uploadingFiles.value[i];
           try {
             const result = await uploadService.uploadFile(
               uploadItem.file,
-              (progress) => {
-                uploadItem.progress = progress;
-                uploadItem.uploaded = Math.round((uploadItem.size * progress) / 100);
-              }
+              (progress) => updateUploadProgress(uploadItem, progress)
             );
-            uploadItem.status = 'completed';
+            uploadItem.status = UPLOAD_STATUS.COMPLETED;
             uploadItem.progress = 100;
             results.push(result.file);
           } catch (error) {
-            uploadItem.status = 'error';
+            uploadItem.status = UPLOAD_STATUS.ERROR;
             console.error(`Upload error for ${uploadItem.name}:`, error);
           }
         }
 
-        // ย้ายไฟล์ที่เสร็จแล้วไป uploadedFiles
+        // Move completed files to uploadedFiles
         uploadedFiles.value.unshift(...results);
 
-        // รอสักครู่แล้วลบไฟล์ที่เสร็จ/error ออกจาก uploadingFiles
-        setTimeout(() => {
-          uploadingFiles.value = uploadingFiles.value.filter(f => f.status === 'uploading');
-          if (uploadingFiles.value.length === 0) {
-            isUploading.value = false;
-          }
-        }, 1000);
+        // Clean up completed/error files after delay
+        cleanupCompletedFiles();
 
-        selectedFiles.value = [];
-        fileInput.value.value = '';
+        resetUploadForm();
       } catch (error) {
         console.error('Upload error:', error);
         errorMessage.value = error.response?.data?.message || 'เกิดข้อผิดพลาดในการอัปโหลด';
@@ -455,6 +581,11 @@ export default {
       }
     };
 
+    /**
+     * Formats file size in bytes to human-readable format
+     * @param {number} bytes - File size in bytes
+     * @returns {string} Formatted file size (e.g., "1.5 MB")
+     */
     const formatFileSize = (bytes) => {
       if (bytes === 0) return '0 Bytes';
       const k = 1024;
@@ -463,38 +594,56 @@ export default {
       return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
     };
 
-    // File icon helpers (UI only)
+    /**
+     * Determines file type based on extension
+     * @param {string} fileName - Full filename
+     * @returns {string} File type: 'pdf', 'image', 'video', or 'file'
+     */
     const getFileIcon = (fileName) => {
-      const ext = fileName.split('.').pop()?.toLowerCase();
-      if (['pdf'].includes(ext)) {
+      const ext = getFileExtension(fileName);
+      
+      if (FILE_EXTENSIONS.PDF.includes(ext)) {
         return 'pdf';
-      } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
+      } else if (FILE_EXTENSIONS.IMAGE.includes(ext)) {
         return 'image';
-      } else if (['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm'].includes(ext)) {
+      } else if (FILE_EXTENSIONS.VIDEO.includes(ext)) {
         return 'video';
       }
       return 'file';
     };
 
+    /**
+     * Gets CSS classes for file icon based on file type
+     * @param {string} fileName - Full filename
+     * @returns {string} CSS classes for file icon
+     */
     const getFileIconClass = (fileName) => {
-      const ext = fileName.split('.').pop()?.toLowerCase();
-      if (['pdf'].includes(ext)) {
-        return 'bg-red-50 text-red-600';
-      } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
-        return 'bg-green-50 text-green-600';
-      } else if (['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm'].includes(ext)) {
-        return 'bg-blue-50 text-blue-600';
+      const ext = getFileExtension(fileName);
+      
+      if (FILE_EXTENSIONS.PDF.includes(ext)) {
+        return FILE_ICON_CLASSES.PDF;
+      } else if (FILE_EXTENSIONS.IMAGE.includes(ext)) {
+        return FILE_ICON_CLASSES.IMAGE;
+      } else if (FILE_EXTENSIONS.VIDEO.includes(ext)) {
+        return FILE_ICON_CLASSES.VIDEO;
       }
-      return 'bg-slate-50 text-slate-600';
+      return FILE_ICON_CLASSES.DEFAULT;
     };
 
-    // Helper to get completed file link from uploadedFiles
+    /**
+     * Gets completed file link from uploadedFiles by filename
+     * @param {string} fileName - Name of the file
+     * @returns {string|null} Google Drive web view link or null
+     */
     const getCompletedFileLink = (fileName) => {
       const uploadedFile = uploadedFiles.value.find(f => f.name === fileName);
       return uploadedFile?.webViewLink || null;
     };
 
-    // Copy file link to clipboard
+    /**
+     * Copies file link to clipboard
+     * @param {string} fileName - Name of the file to copy link for
+     */
     const copyFileLink = async (fileName) => {
       const link = getCompletedFileLink(fileName);
       if (link) {
@@ -507,56 +656,81 @@ export default {
       }
     };
 
-    // Navbar event handlers
+    /**
+     * Clears authentication data and redirects to login
+     */
     const handleLogout = () => {
-      // Clear auth data
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      // Redirect to login
-      router.push('/login');
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.USER);
+      router.push(ROUTES.LOGIN);
     };
 
+    /**
+     * Navigates to profile page
+     */
     const handleProfile = () => {
-      router.push('/profile');
+      router.push(ROUTES.PROFILE);
     };
 
+    /**
+     * Handles settings button click
+     * TODO: Open settings modal or navigate to settings page
+     */
     const handleSettings = () => {
       console.log('Settings clicked');
-      // TODO: Open settings modal or navigate to settings page
     };
 
-    // Folder Modal functions
+    /**
+     * Opens folder selection modal
+     */
     const openFolderModal = () => {
       showFolderModal.value = true;
     };
 
+    /**
+     * Closes folder selection modal
+     */
     const closeFolderModal = () => {
       showFolderModal.value = false;
     };
 
+    /**
+     * Confirms folder selection
+     * TODO: Implement folder selection logic
+     */
     const confirmFolderSelection = () => {
-      // TODO: Implement folder selection logic
       closeFolderModal();
     };
 
-    // Clear completed files
+    /**
+     * Clears completed files from both uploadedFiles and uploadingFiles
+     */
     const clearCompletedFiles = () => {
       uploadedFiles.value = uploadedFiles.value.filter(file => {
         const uploadingItem = uploadingFiles.value.find(uf => uf.name === file.name);
-        return !uploadingItem || uploadingItem.status !== 'completed';
+        return !uploadingItem || uploadingItem.status !== UPLOAD_STATUS.COMPLETED;
       });
-      uploadingFiles.value = uploadingFiles.value.filter(f => f.status === 'uploading');
+      uploadingFiles.value = uploadingFiles.value.filter(f => f.status === UPLOAD_STATUS.UPLOADING);
     };
 
-    // Computed properties
+    /**
+     * Computed: Calculates total upload progress percentage
+     * @returns {number} Average progress percentage (0-100)
+     */
     const totalProgress = computed(() => {
       if (uploadingFiles.value.length === 0) return 0;
       const total = uploadingFiles.value.reduce((sum, file) => sum + (file.progress || 0), 0);
       return Math.round(total / uploadingFiles.value.length);
     });
 
+    /**
+     * Computed: Counts completed or error files
+     * @returns {number} Number of completed/error files
+     */
     const completedFilesCount = computed(() => {
-      return uploadingFiles.value.filter(f => f.status === 'completed' || f.status === 'error').length;
+      return uploadingFiles.value.filter(f => 
+        f.status === UPLOAD_STATUS.COMPLETED || f.status === UPLOAD_STATUS.ERROR
+      ).length;
     });
 
     return {

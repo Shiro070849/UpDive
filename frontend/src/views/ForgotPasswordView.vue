@@ -98,10 +98,43 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
+/**
+ * ForgotPasswordView Component
+ * Handles password reset functionality
+ */
+
+// Constants
+const ROUTES = {
+  LOGIN: '/login'
+};
+
+const API_ENDPOINTS = {
+  FORGOT_PASSWORD: '/api/auth/forgot-password'
+};
+
+const VALIDATION = {
+  MIN_PASSWORD_LENGTH: 6
+};
+
+const ERROR_MESSAGES = {
+  PASSWORD_TOO_SHORT: 'Password must be at least 6 characters',
+  PASSWORDS_NOT_MATCH: 'Passwords do not match',
+  RESET_FAILED: 'Failed to reset password',
+  CONNECTION_ERROR: 'Cannot connect to server'
+};
+
+const SUCCESS_MESSAGES = {
+  PASSWORD_RESET: 'Password reset successfully! Redirecting to login...'
+};
+
+const REDIRECT_DELAY_MS = 2000; // 2 seconds
+
 export default {
   name: 'ForgotPasswordView',
   setup() {
     const router = useRouter();
+    
+    // Reactive state
     const username = ref('');
     const newPassword = ref('');
     const confirmPassword = ref('');
@@ -111,46 +144,82 @@ export default {
     const showPassword = ref(false);
     const showConfirmPassword = ref(false);
 
+    /**
+     * Resets all form messages
+     */
+    const resetMessages = () => {
+      errorMessage.value = '';
+      successMessage.value = '';
+    };
+
+    /**
+     * Validates password requirements
+     * @param {string} password - New password to validate
+     * @param {string} confirmPassword - Confirmation password
+     * @returns {Object} Validation result with isValid flag and error message
+     */
+    const validatePassword = (password, confirmPassword) => {
+      if (password.length < VALIDATION.MIN_PASSWORD_LENGTH) {
+        return {
+          isValid: false,
+          error: ERROR_MESSAGES.PASSWORD_TOO_SHORT
+        };
+      }
+      
+      if (password !== confirmPassword) {
+        return {
+          isValid: false,
+          error: ERROR_MESSAGES.PASSWORDS_NOT_MATCH
+        };
+      }
+      
+      return { isValid: true, error: '' };
+    };
+
+    /**
+     * Handles API error and returns user-friendly error message
+     * @param {Error} error - The error object from axios
+     * @returns {string} User-friendly error message
+     */
+    const handleApiError = (error) => {
+      if (error.response) {
+        return error.response.data.message || ERROR_MESSAGES.RESET_FAILED;
+      }
+      return ERROR_MESSAGES.CONNECTION_ERROR;
+    };
+
+    /**
+     * Handles password reset form submission
+     * Validates input, resets password, and redirects to login on success
+     */
     const handleResetPassword = async () => {
       try {
-        // Reset messages
-        errorMessage.value = '';
-        successMessage.value = '';
+        resetMessages();
 
-        // Validate password length
-        if (newPassword.value.length < 6) {
-          errorMessage.value = 'Password must be at least 6 characters';
-          return;
-        }
-
-        // Validate password match
-        if (newPassword.value !== confirmPassword.value) {
-          errorMessage.value = 'Passwords do not match';
+        // Validate password
+        const validation = validatePassword(newPassword.value, confirmPassword.value);
+        if (!validation.isValid) {
+          errorMessage.value = validation.error;
           return;
         }
 
         isLoading.value = true;
 
-        const response = await axios.post(process.env.VUE_APP_API_URL + '/api/auth/forgot-password', {
+        const apiUrl = process.env.VUE_APP_API_URL + API_ENDPOINTS.FORGOT_PASSWORD;
+        const response = await axios.post(apiUrl, {
           username: username.value,
           newPassword: newPassword.value
         });
 
         if (response.data.success) {
-          successMessage.value = 'Password reset successfully! Redirecting to login...';
-          
-          // Redirect to login after 2 seconds
+          successMessage.value = SUCCESS_MESSAGES.PASSWORD_RESET;
           setTimeout(() => {
-            router.push('/login');
-          }, 2000);
+            router.push(ROUTES.LOGIN);
+          }, REDIRECT_DELAY_MS);
         }
       } catch (error) {
         console.error('Reset password error:', error);
-        if (error.response) {
-          errorMessage.value = error.response.data.message || 'Failed to reset password';
-        } else {
-          errorMessage.value = 'Cannot connect to server';
-        }
+        errorMessage.value = handleApiError(error);
       } finally {
         isLoading.value = false;
       }
@@ -176,4 +245,6 @@ export default {
   background-image: url('@/assets/images/Dive_Bg.png');
 }
 </style>
+
+
 
