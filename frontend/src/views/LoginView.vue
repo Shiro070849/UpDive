@@ -48,6 +48,10 @@
           {{ errorMessage }}
         </div>
 
+        <div v-if="successMessage" class="text-green-600 text-[11px] font-medium py-1 px-2 bg-green-50 rounded-lg border border-green-500">
+          {{ successMessage }}
+        </div>
+
         <button
           class="w-full h-8 bg-gradient-to-br from-[#5B9BD5] to-[#4A8BC2] text-white border-0 rounded-lg text-[11px] font-semibold cursor-pointer transition-all duration-300 mt-0.5 hover:bg-gradient-to-br hover:from-[#4A8BC2] hover:to-[#3A7BB2] hover:-translate-y-px hover:shadow-[0_4px_12px_rgba(91,155,213,0.3)] active:translate-y-0 disabled:opacity-60 disabled:cursor-not-allowed"
           type="submit"
@@ -107,6 +111,7 @@ export default {
     const username = ref('');
     const password = ref('');
     const errorMessage = ref('');
+    const successMessage = ref('');
     const isLoading = ref(false);
     const showPassword = ref(false);
 
@@ -140,6 +145,7 @@ export default {
       try {
         isLoading.value = true;
         errorMessage.value = '';
+        successMessage.value = '';
 
         const apiUrl = process.env.VUE_APP_API_URL + API_ENDPOINTS.LOGIN;
         const response = await axios.post(apiUrl, {
@@ -149,7 +155,14 @@ export default {
 
         if (response.data.success) {
           saveAuthData(response.data.token, response.data.user);
-          router.push(ROUTES.UPLOAD);
+
+          // Show success message
+          successMessage.value = 'Login successful! Redirecting...';
+
+          // Wait 1 second before redirect to show the message
+          setTimeout(() => {
+            router.push(ROUTES.UPLOAD);
+          }, 1000);
         }
       } catch (error) {
         console.error('Login error:', error);
@@ -163,6 +176,7 @@ export default {
       username,
       password,
       errorMessage,
+      successMessage,
       isLoading,
       showPassword,
       handleLogin
